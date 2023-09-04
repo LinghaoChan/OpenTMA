@@ -2,6 +2,7 @@ NAME: config_temos_unimocap_1e-5_infonce_multi_gpu_nce1e-1_layer6_head6-V2 # Exp
 DEBUG: False # Debug mode
 ACCELERATOR: 'gpu' # Devices optioncal: “cpu”, “gpu”, “tpu”, “ipu”, “hpu”, “mps, “auto”
 DEVICE: [0, 1, 2, 3] # Index of gpus eg. [0] or [0,1,2,3]
+# DEVICE: [0] # Index of gpus eg. [0] or [0,1,2,3]
 
 # Training configuration
 TRAIN:
@@ -64,6 +65,7 @@ LOSS:
   DIST_SYNC_ON_STEP: False # Sync Losses on step when distributed trained
   USE_RECLIPLOSS: False
   SYNC: False
+  TRAIN_TMR: False
 
 # Model Configuration
 model:

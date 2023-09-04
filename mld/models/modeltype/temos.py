@@ -136,12 +136,19 @@ class TEMOS(BaseModel):
                                         output_size=cfg.model.t2m_textencoder.dim_coemb_hidden,
                                        )
         elif cfg.model.eval_text_source == 'only_text_token':
-
-            self.t2m_textencoder = t2m_textenc.TextEncoderBiGRUCoV2(word_size=cfg.model.t2m_textencoder.dim_word,
-                                        pos_size=cfg.model.t2m_textencoder.dim_pos_ohot, # added
-                                        hidden_size=cfg.model.t2m_textencoder.dim_text_hidden,
-                                        output_size=cfg.model.t2m_textencoder.dim_coemb_hidden,
-                                       )
+            if "unimocap" in cfg.EVAL.DATASETS:
+                self.t2m_textencoder = t2m_textenc.TextEncoderBiGRUCoV2(word_size=cfg.model.t2m_textencoder.dim_word,
+                                            pos_size=cfg.model.t2m_textencoder.dim_pos_ohot, # added
+                                            hidden_size=cfg.model.t2m_textencoder.dim_text_hidden,
+                                            output_size=cfg.model.t2m_textencoder.dim_coemb_hidden,
+                                            dataset = "unimocap"
+                                        )
+            else: 
+                self.t2m_textencoder = t2m_textenc.TextEncoderBiGRUCoV2(word_size=cfg.model.t2m_textencoder.dim_word,
+                                            pos_size=cfg.model.t2m_textencoder.dim_pos_ohot, # added
+                                            hidden_size=cfg.model.t2m_textencoder.dim_text_hidden,
+                                            output_size=cfg.model.t2m_textencoder.dim_coemb_hidden,
+                                        )
 
         elif cfg.model.eval_text_source in ['caption']:
 
@@ -161,11 +168,19 @@ class TEMOS(BaseModel):
                     p.requires_grad = False
 
             elif 'GRU' in cfg.model.eval_text_encode_way:
-                self.t2m_textencoder = t2m_textenc.TextEncoderBiGRUCoV2(word_size=cfg.model.t2m_textencoder.dim_word,
-                                            pos_size=cfg.model.t2m_textencoder.dim_pos_ohot, # added
-                                            hidden_size=cfg.model.t2m_textencoder.dim_text_hidden,
-                                            output_size=cfg.model.t2m_textencoder.dim_coemb_hidden,
-                                        )
+                if "unimocap" in cfg.EVAL.DATASETS:
+                    self.t2m_textencoder = t2m_textenc.TextEncoderBiGRUCoV2(word_size=cfg.model.t2m_textencoder.dim_word,
+                                                pos_size=cfg.model.t2m_textencoder.dim_pos_ohot, # added
+                                                hidden_size=cfg.model.t2m_textencoder.dim_text_hidden,
+                                                output_size=cfg.model.t2m_textencoder.dim_coemb_hidden,
+                                                dataset="unimocap"
+                                            )
+                else:
+                    self.t2m_textencoder = t2m_textenc.TextEncoderBiGRUCoV2(word_size=cfg.model.t2m_textencoder.dim_word,
+                                                pos_size=cfg.model.t2m_textencoder.dim_pos_ohot, # added
+                                                hidden_size=cfg.model.t2m_textencoder.dim_text_hidden,
+                                                output_size=cfg.model.t2m_textencoder.dim_coemb_hidden,
+                                            )
             else:
                 raise NotImplementedError
 
@@ -234,7 +249,7 @@ class TEMOS(BaseModel):
             t2m_checkpoint = torch.load(
                 os.path.join(cfg.model.t2m_path, dataname,
                             "text_mot_match/model/finest.tar"),  map_location=torch.device('cpu'))
-
+        # import pdb; pdb.set_trace()
         self.t2m_textencoder.load_state_dict(t2m_checkpoint["text_encoder"])
         
         self.t2m_moveencoder.load_state_dict(

@@ -61,6 +61,9 @@ LOSS:
   LAMBDA_INFONCE: 0.1 # Lambda for infonce
   INFONCE_TEMP: 0.1
   DIST_SYNC_ON_STEP: False # Sync Losses on step when distributed trained
+  USE_RECLIPLOSS: False
+  SYNC: False
+  TRAIN_TMR: False
 
 # Model Configuration
 model:

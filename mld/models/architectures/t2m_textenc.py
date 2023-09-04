@@ -50,10 +50,10 @@ class TextEncoderBiGRUCo(nn.Module):
 
 
 class TextEncoderBiGRUCoV2(nn.Module):
-    def __init__(self, word_size, pos_size, hidden_size, output_size):
+    def __init__(self, word_size, pos_size, hidden_size, output_size, dataset=None):
         super(TextEncoderBiGRUCoV2, self).__init__()
-
-        # self.pos_emb = nn.Linear(pos_size, word_size)
+        if dataset == "unimocap":
+            self.pos_emb = nn.Linear(pos_size, word_size)
         self.input_emb = nn.Linear(word_size, hidden_size)
         self.gru = nn.GRU(hidden_size, hidden_size, batch_first=True, bidirectional=True)
         self.output_net = nn.Sequential(
