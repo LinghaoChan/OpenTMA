@@ -45,16 +45,6 @@ class Dataset(torch.utils.data.Dataset):
         self._original_train = None
         self._original_test = None
 
-        # TBD
-        # self._actions
-        # self._train/self._test
-        # self._num_frames_in_video[data_index]
-        # self._action_to_label[action]
-        # self._label_to_action[label]
-        # self._load_pose(data_index, frame_ix)
-        # self._actions[ind] # => carefull changed here
-        # self._action_classes[action]
-
     def action_to_label(self, action):
         return self._action_to_label[action]
 

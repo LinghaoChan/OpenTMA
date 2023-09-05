@@ -124,8 +124,23 @@ def main():
 
         state_dict = torch.load(cfg.TEST.CHECKPOINTS,
                                 map_location="cpu")["state_dict"]
+        from collections import OrderedDict
+        vae_dict = OrderedDict()
+        ckpt = "./deps/TMR-pretrained/TMR-MotionX.ckpt"
+        TMR_state_dict = torch.load(ckpt)["state_dict"]
+        for k, v in TMR_state_dict.items():
+            if k.split(".")[0] == "textencoder":
+                name = k.replace("textencoder", "t2m_TMR_textencoder")
+                vae_dict[name] = v
+            if k.split(".")[0] == "motionencoder":
+                name = k.replace("motionencoder", "t2m_TMR_motionencoder")
+                vae_dict[name] = v
+            if k.split(".")[0] == "filter_model":
+                name = k.replace("filter_model", "filter_model")
+                vae_dict[name] = v
         # import pdb; pdb.set_trace()
-        model.load_state_dict(state_dict, strict)
+        state_dict.update(vae_dict)
+        model.load_state_dict(state_dict, strict=True)
     # import pdb; pdb.set_trace()
     if use_differnt_t2m:
         # t2m_checkpoint = torch.load('/comp_robot/lushunlin/motion-latent-diffusion/deps/t2m/motionx/version_only_humanml/smplx_212/text_mot_match_glove_6B_caption_bs_256/model/finest.tar')
