@@ -8,8 +8,8 @@ def neg_recall(mat, k_value):
     neg_lists = []
     N = len(mat)
     for i in range(N):
-        array = np.arange(N)  # 创建包含0到N-1的数组
-        np.random.shuffle(array)  # 随机打乱数组顺序
+        array = np.arange(N)
+        np.random.shuffle(array)
         neg_list = list(array[:32])
         if i in neg_list:
             neg_list.remove(i)
@@ -19,23 +19,19 @@ def neg_recall(mat, k_value):
         # print(len(neg_list))
     hits = 0
     for rowid in range(len(mat)):
-        # import pdb; pdb.set_trace()
         row = mat[rowid]
-        # print(row)
         negsocres = list(row[neg_lists[rowid]])
-        # print(negsocres)
         count_large = 0
         for one_score in negsocres:
             if row[rowid] < one_score:
                 count_large += 1
         if count_large <= k_value - 1:
             hits += 1
-        # print(count_large)
     return hits
 
 def main(args):
     # expdirs =  [
-    #             "/comp_robot/lushunlin/motion-latent-diffusion/results/temos/temos_humanml3d_kl_1e-5_wlatent/embeddings/test/epoch_0/"
+    #             "./results/temos/temos_humanml3d_kl_1e-5_wlatent/embeddings/test/epoch_0/"
     #             ]
     # retrieval_type = "T2M"
     # protocal = "D"
@@ -58,7 +54,6 @@ def main(args):
         text_embedding = np.load(text_emb_dir)
         motion_embedding = np.load(motion_emb_dir)
         sbert_embedding = np.load(sbert_emb_dir)
-        # sbert_embedding = np.load("/comp_robot/lushunlin/motion-latent-diffusion/results/temos/temos_humanml3d_kl_1e-5_wlatent_infonce_4gpu/embeddings/test/epoch_0/sbert_embedding.npy")
 
         sbert_embedding = sbert_embedding / np.linalg.norm(sbert_embedding, axis=1, keepdims=True)
         
@@ -105,7 +100,7 @@ def main(args):
                 # print(f'Recall @{k}: | ', "%.3f" % (100.0 * (hits / N)))
                 RecK_list[index].append("%.3f" % (100.0 * (hits / N)))
         # print(RecK_list)
-    # print()
+
     print('|   Metrics   |', end='  ')
     for k in K_list:
         print(f'Recall @{k} |', end='  ')
