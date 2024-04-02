@@ -6,8 +6,6 @@ import torch
 from omegaconf import OmegaConf
 from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.callbacks import ModelCheckpoint
-# from pytorch_lightning.strategies.ddp import DDPStrategy
-
 from mld.callback import ProgressLogger
 from mld.config import parse_args
 from mld.data.get_data import get_datasets
@@ -16,13 +14,13 @@ from mld.utils.logger import create_logger
 
 
 def main():
-    # parse options
-    cfg = parse_args()  # parse config file
-    # import pdb; pdb.set_trace()
-    # create logger
+    # Parse arguments from command line
+    cfg = parse_args()
+
+    # Create a logger for logging events during training
     logger = create_logger(cfg, phase="train")
-    # import pdb; pdb.set_trace()
-    # resume
+
+    # If a previous training session is to be resumed
     if cfg.TRAIN.RESUME:
         resume = cfg.TRAIN.RESUME
         backcfg = cfg.TRAIN.copy()
@@ -51,14 +49,13 @@ def main():
 
         else:
             raise ValueError("Resume path is not right.")
-    # set seed
-    pl.seed_everything(cfg.SEED_VALUE)
 
-    # gpu setting
+    # Set a seed for reproducibility
+    pl.seed_everything(cfg.SEED_VALUE)
+    
+    # If the accelerator is a GPU, disable tokenizers parallelism
     if cfg.ACCELERATOR == "gpu":
-        # os.environ["PYTHONWARNINGS"] = "ignore"
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
-        # os.environ['CUDA_VISIBLE_DEVICES'] = ",".join(str(x) for x in cfg.DEVICE)
 
     # tensorboard logger and wandb logger
     loggers = []
@@ -90,8 +87,8 @@ def main():
     # create model
     model = get_model(cfg, datasets[0])
     logger.info("model {} loaded".format(cfg.model.model_type))
-    # import pdb; pdb.set_trace()
-    # optimizer
+    
+    # Define metrics to monitor
     metric_monitor = {
         "Train_jf": "recons/text2jfeats/train",
         "Val_jf": "recons/text2jfeats/val",
@@ -116,11 +113,10 @@ def main():
         "gt_Accuracy": "Metrics/gt_accuracy",
     }
 
-    # callbacks
+    # Define callbacks for training
     callbacks = [
         pl.callbacks.RichProgressBar(),
         ProgressLogger(metric_monitor=metric_monitor),
-        # ModelCheckpoint(dirpath=os.path.join(cfg.FOLDER_EXP,'checkpoints'),filename='latest-{epoch}',every_n_epochs=1,save_top_k=1,save_last=True,save_on_train_epoch_end=True),
         ModelCheckpoint(
             dirpath=os.path.join(cfg.FOLDER_EXP, "checkpoints"),
             filename="{epoch}",
@@ -134,21 +130,19 @@ def main():
     ]
     logger.info("Callbacks initialized")
 
+    # Define the distributed data parallel strategy
     if len(cfg.DEVICE) > 1:
-        # ddp_strategy = DDPStrategy(find_unused_parameters=False)
         ddp_strategy = "ddp"
     else:
         ddp_strategy = None
-    # import pdb; pdb.set_trace()
-    # trainer
+
+    # Create the trainer
     trainer = pl.Trainer(
         benchmark=False,
         max_epochs=cfg.TRAIN.END_EPOCH,
         accelerator=cfg.ACCELERATOR,
         devices=cfg.DEVICE,
-        # gpus=2,
         strategy=ddp_strategy,
-        # move_metrics_to_cpu=True,
         default_root_dir=cfg.FOLDER_EXP,
         log_every_n_steps=cfg.LOGGER.VAL_EVERY_STEPS,
         deterministic=False,
@@ -160,9 +154,6 @@ def main():
     )
     logger.info("Trainer initialized")
 
-    # vae_type = cfg.model.motion_vae.target.split(".")[-1].lower().replace(
-    #     "vae", "")
-    # import pdb; pdb.set_trace()
     if cfg.TRAIN.STAGE == 'temos':
         vae_type = 'temos'
     else:
@@ -204,6 +195,7 @@ def main():
 
 
 
+    # Load pre-trained models if specified
     if cfg.TRAIN.PRETRAINED:
         
         logger.info("Loading pretrain mode from {}".format(
@@ -220,9 +212,7 @@ def main():
                 new_state_dict[k] = v
         model.load_state_dict(new_state_dict, strict=False)
 
-    # fitting
-    
-
+    # Start training and validation
     if cfg.TRAIN.RESUME:
         trainer.validate(model, datamodule=datasets[0], ckpt_path=cfg.TRAIN.PRETRAINED)
         trainer.fit(model,
@@ -232,13 +222,12 @@ def main():
         trainer.validate(model, datamodule=datasets[0])
         trainer.fit(model, datamodule=datasets[0])
 
-    # checkpoint
+    # Log the location of the checkpoints and outputs
     checkpoint_folder = trainer.checkpoint_callback.dirpath
     logger.info(f"The checkpoints are stored in {checkpoint_folder}")
-    logger.info(
-        f"The outputs of this experiment are stored in {cfg.FOLDER_EXP}")
+    logger.info(f"The outputs of this experiment are stored in {cfg.FOLDER_EXP}")
 
-    # end
+    # Log the end of training
     logger.info("Training ends!")
 
 
