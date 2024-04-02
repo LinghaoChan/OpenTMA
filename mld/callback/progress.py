@@ -5,7 +5,7 @@ import psutil
 
 logger = logging.getLogger()
 
-# Define a custom callback class for PyTorch Lightning
+
 class ProgressLogger(Callback):
     """
     A custom callback class for PyTorch Lightning that logs progress information during training.
@@ -38,8 +38,10 @@ class ProgressLogger(Callback):
                            padding=False,
                            **kwargs) -> None:
         # Log a message when a training epoch ends
-        metric_format = f"{{:.{self.precision}e}}"  # Format for logging metrics
-        line = f"Epoch {trainer.current_epoch}"     # Start the log line with the epoch number
+        # Format for logging metrics
+        metric_format = f"{{:.{self.precision}e}}"
+        # Start the log line with the epoch number
+        line = f"Epoch {trainer.current_epoch}"
         if padding:
             line = f"{line:>{len('Epoch xxxx')}}"   # Right padding
         metrics_str = []
