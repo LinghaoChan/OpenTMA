@@ -7,6 +7,16 @@ from pytorch_lightning.utilities.rank_zero import rank_zero_only
 
 
 def create_logger(cfg, phase='train'):
+    """
+    Creates a logger for logging the training or testing process.
+
+    Args:
+        cfg (OmegaConf): The configuration object containing all the necessary parameters.
+        phase (str, optional): The phase of the process. Defaults to 'train'.
+
+    Returns:
+        logger (logging.Logger): The logger object for logging the process.
+    """
     # root dir set by cfg
     root_output_dir = Path(cfg.FOLDER)
     # set up logger
@@ -36,6 +46,18 @@ def create_logger(cfg, phase='train'):
 
 @rank_zero_only
 def config_logger(final_output_dir, time_str, phase, head):
+    """
+    Configures the logger for logging the training or testing process.
+
+    Args:
+        final_output_dir (Path): The final output directory where the log file will be saved.
+        time_str (str): The current time in string format.
+        phase (str): The phase of the process.
+        head (str): The format of the log message.
+
+    Returns:
+        logger (logging.Logger): The logger object for logging the process.
+    """
     log_file = '{}_{}_{}.log'.format('log', time_str, phase)
     final_log_file = final_output_dir / log_file
     logging.basicConfig(filename=str(final_log_file))
@@ -54,6 +76,15 @@ def config_logger(final_output_dir, time_str, phase, head):
 
 @rank_zero_only
 def new_dir(cfg, phase, time_str, final_output_dir):
+    """
+    Creates a new directory for the experiment and saves the configuration file.
+
+    Args:
+        cfg (OmegaConf): The configuration object containing all the necessary parameters.
+        phase (str): The phase of the process.
+        time_str (str): The current time in string format.
+        final_output_dir (Path): The final output directory where the log file will be saved.
+    """
     # new experiment folder
     cfg.TIME = str(time_str)
     if os.path.exists(

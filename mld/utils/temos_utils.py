@@ -1,15 +1,25 @@
 from typing import Dict, List
-
 import numpy as np
 import torch
 from torch import Tensor
-
 import mld.utils.geometry as geometry
 
 
 def lengths_to_mask(lengths: List[int],
                     device: torch.device,
-                    max_len: int = None) -> Tensor:
+                    max_len: int = None):
+    """
+    Converts lengths to a mask tensor.
+
+    Args:
+        lengths (List[int]): List of lengths.
+        device (torch.device): The device on which the tensor will be allocated.
+        max_len (int, optional): The maximum length. If None, the maximum length is set to the maximum value in lengths.
+
+    Returns:
+        Tensor: A tensor mask of shape (len(lengths), max_len).
+    """
+    
     lengths = torch.tensor(lengths, device=device)
     max_len = max_len if max_len else max(lengths)
     mask = torch.arange(max_len, device=device).expand(
@@ -18,10 +28,29 @@ def lengths_to_mask(lengths: List[int],
 
 
 def detach_to_numpy(tensor):
+    """
+    Detaches a tensor and converts it to a numpy array.
+
+    Args:
+        tensor (Tensor): The tensor to detach and convert.
+
+    Returns:
+        ndarray: The detached tensor as a numpy array.
+    """
     return tensor.detach().cpu().numpy()
 
 
 def remove_padding(tensors, lengths):
+    """
+    Removes padding from tensors according to the corresponding lengths.
+
+    Args:
+        tensors (List[Tensor]): List of tensors.
+        lengths (List[int]): List of lengths.
+
+    Returns:
+        List[Tensor]: List of tensors with padding removed.
+    """
     return [
         tensor[:tensor_length]
         for tensor, tensor_length in zip(tensors, lengths)
@@ -29,6 +58,18 @@ def remove_padding(tensors, lengths):
 
 
 def nfeats_of(rottype):
+    """
+    Returns the number of features of a rotation type.
+
+    Args:
+        rottype (str): The rotation type.
+
+    Returns:
+        int: The number of features.
+
+    Raises:
+        TypeError: If the rotation type is not recognized.
+    """
     if rottype in ["rotvec", "axisangle"]:
         return 3
     elif rottype in ["rotquat", "quaternion"]:
@@ -42,6 +83,19 @@ def nfeats_of(rottype):
 
 
 def axis_angle_to(newtype, rotations):
+    """
+    Converts axis-angle rotations to another rotation type.
+
+    Args:
+        newtype (str): The new rotation type.
+        rotations (Tensor): The rotations to convert.
+
+    Returns:
+        Tensor: The converted rotations.
+
+    Raises:
+        NotImplementedError: If the new rotation type is not recognized.
+    """
     if newtype in ["matrix"]:
         rotations = geometry.axis_angle_to_matrix(rotations)
         return rotations
@@ -63,6 +117,19 @@ def axis_angle_to(newtype, rotations):
 
 
 def matrix_to(newtype, rotations):
+    """
+    Converts matrix rotations to another rotation type.
+
+    Args:
+        newtype (str): The new rotation type.
+        rotations (Tensor): The rotations to convert.
+
+    Returns:
+        Tensor: The converted rotations.
+
+    Raises:
+        NotImplementedError: If the new rotation type is not recognized.
+    """
     if newtype in ["matrix"]:
         return rotations
     if newtype in ["rotmat"]:
@@ -82,6 +149,19 @@ def matrix_to(newtype, rotations):
 
 
 def to_matrix(oldtype, rotations):
+    """
+    Converts rotations of a certain type to matrix rotations.
+
+    Args:
+        oldtype (str): The old rotation type.
+        rotations (Tensor): The rotations to convert.
+
+    Returns:
+        Tensor: The converted rotations.
+
+    Raises:
+        NotImplementedError: If the old rotation type is not recognized.
+    """
     if oldtype in ["matrix"]:
         return rotations
     if oldtype in ["rotmat"]:

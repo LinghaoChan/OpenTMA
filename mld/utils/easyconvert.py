@@ -1,7 +1,15 @@
 import mld.utils.geometry as geometry
 
 
+# This function returns the number of features for a given rotation type.
 def nfeats_of(rottype):
+    """
+    Parameters:
+    rottype (str): The type of rotation.
+
+    Returns:
+    int: The number of features for the rotation type.
+    """
     if rottype in ["rotvec", "axisangle"]:
         return 3
     elif rottype in ["rotquat", "quaternion"]:
@@ -13,8 +21,18 @@ def nfeats_of(rottype):
     else:
         return TypeError("This rotation type doesn't have features.")
 
+# This function converts axis-angle rotations to another rotation type.
+
 
 def axis_angle_to(newtype, rotations):
+    """
+    Parameters:
+    newtype (str): The new type of rotation.
+    rotations (np.array): The axis-angle rotations.
+
+    Returns:
+    np.array: The rotations converted to the new type.
+    """
     if newtype in ["matrix"]:
         rotations = geometry.axis_angle_to_matrix(rotations)
         return rotations
@@ -34,8 +52,18 @@ def axis_angle_to(newtype, rotations):
     else:
         raise NotImplementedError
 
+# This function converts matrix rotations to another rotation type.
+
 
 def matrix_to(newtype, rotations):
+    """
+    Parameters:
+    newtype (str): The new type of rotation.
+    rotations (np.array): The matrix rotations.
+
+    Returns:
+    np.array: The rotations converted to the new type.
+    """
     if newtype in ["matrix"]:
         return rotations
     if newtype in ["rotmat"]:
@@ -53,8 +81,18 @@ def matrix_to(newtype, rotations):
     else:
         raise NotImplementedError
 
+# This function converts rotations of a given type to a matrix.
+
 
 def to_matrix(oldtype, rotations):
+    """
+    Parameters:
+    oldtype (str): The old type of rotation.
+    rotations (np.array): The rotations.
+
+    Returns:
+    np.array: The rotations converted to a matrix.
+    """
     if oldtype in ["matrix"]:
         return rotations
     if oldtype in ["rotmat"]:

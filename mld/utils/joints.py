@@ -1,3 +1,19 @@
+"""
+1. `mmm_joints`, `motionx_joints`, `humanml3d_joints`, `smplh_joints`, `smplnh_joints`: These are lists of joint names for different models. Each model has a different set of joints, and the names of the joints are specific to the model.
+
+2. `mmm2smplh_correspondence`, `smplh2mmm_correspondence`, `smplnh2smplh_correspondence`, `smplh2smplnh_correspondence`: These are dictionaries that map joint names between different models. They are used to convert joint data from one model to another.
+
+3. `mmm_kinematic_tree`, `humanml3d_kinematic_tree`: These are lists of lists that represent the kinematic tree of the respective models. Each sublist represents a chain of joints, with the parent joint at the start of the list and the child joints following in order.
+
+4. `smplh_to_mmm_scaling_factor`, `mmm_to_smplh_scaling_factor`: These are scaling factors used to convert joint positions between the SMPLH and MMM models.
+
+5. `mmm_joints_info`, `smplnh_joints_info`: These are dictionaries that provide information about specific joints in the respective models.
+
+6. `infos`, `mplh_indexes`, `root_joints`: These are dictionaries that aggregate the information from the previous dictionaries for easy access.
+
+7. `get_root_idx`: This is a function that takes a joint type as input and returns the index of the root joint for that type.
+"""
+
 mmm_joints = [
     "root",
     "BP",
@@ -198,7 +214,8 @@ mmm2smplh_correspondence = {
     "RF": "right_foot",
 }
 
-smplh2mmm_correspondence = {val: key for key, val in mmm2smplh_correspondence.items()}
+smplh2mmm_correspondence = {val: key for key,
+                            val in mmm2smplh_correspondence.items()}
 smplh2mmm_indexes = [
     smplh_joints.index(mmm2smplh_correspondence[x]) for x in mmm_joints
 ]
@@ -277,14 +294,3 @@ root_joints = {
 def get_root_idx(joinstype):
     return root_joints[joinstype]
 
-
-# def mmm2smpl(joints_mmm):
-#     mmm2smplnh_indexes = []
-#     for x in smplnh_joints:
-#         if x in smplh2mmm_correspondence:
-#             mmm2smplnh_indexes.append(mmm_joints.index(smplh2mmm_correspondence[x]))
-
-#     spine2 = 0.5*(joints[mmm_joints.index("spine1")] + joints[mmm_joints.index("spine3")])
-
-#     joints = joints_mmm[indexes]
-#     return joints
