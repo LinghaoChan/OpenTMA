@@ -3,6 +3,9 @@ import tqdm
 
 
 class LevelsFilter(logging.Filter):
+    """
+    This class is a filter for logging levels. It allows only the logs of specified levels to pass.
+    """
     def __init__(self, levels):
         self.levels = [getattr(logging, level) for level in levels]
 
@@ -28,6 +31,9 @@ class StreamToLogger(object):
 
 
 class TqdmLoggingHandler(logging.Handler):
+    """
+    This class is a logging handler that writes to a tqdm progress bar.
+    """
     def __init__(self, level=logging.NOTSET):
         super().__init__(level)
 
