@@ -13,10 +13,6 @@ class VQVAELosses(Metric):
 
     def __init__(self, vae, mode, cfg):
         super().__init__(dist_sync_on_step=cfg.LOSS.DIST_SYNC_ON_STEP)
-
-        # Save parameters
-        # self.vae = vae
-        # self.vae_type = cfg.TRAIN.ABLATION.VAE_TYPE
         self.mode = mode
         self.cfg = cfg
         self.predict_epsilon = cfg.TRAIN.ABLATION.PREDICT_EPSILON
@@ -49,10 +45,6 @@ class VQVAELosses(Metric):
             # KL loss
             losses.append("kl_motion")
 
-            # vel Loss
-            # if cfg.LOSS.Velocity_loss:
-            #     losses.append("recons_velocity")
-
         if self.stage not in ['vae', 'diffusion', 'vae_diffusion']:
             raise ValueError(f"Stage {self.stage} not supported")
 
@@ -62,7 +54,7 @@ class VQVAELosses(Metric):
             self.add_state(loss,
                            default=torch.tensor(0.0),
                            dist_reduce_fx="sum")
-            # self.register_buffer(loss, torch.tensor(0.0))
+            
         self.add_state("count", torch.tensor(0), dist_reduce_fx="sum")
         self.losses = losses
 
@@ -120,9 +112,6 @@ class VQVAELosses(Metric):
                                        rs_set['m_ref'][..., 4 : (self.cfg.DATASET.NFEATS - 1) * 3 + 4])
             total += self._update_loss("x_commit", rs_set['commit_x'], rs_set['commit_x_d'])
             
-            # if self.cfg.LOSS.Velocity_loss:
-            #     total += self._update_loss("recons_velocity", rs_set['vel_rst'], rs_set['m_rst']rs_set['vel_ref'])
-
         if self.stage in ["diffusion", "vae_diffusion"]:
             # predict noise
             if self.predict_epsilon:

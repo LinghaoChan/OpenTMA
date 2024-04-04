@@ -28,7 +28,6 @@ class TemosLosses(Metric):
 
     def __init__(self, vae, mode, cfg):
         super().__init__(dist_sync_on_step=cfg.LOSS.DIST_SYNC_ON_STEP)
-        # import pdb; pdb.set_trace()
         # Save parameters
         self.vae = vae
         self.mode = mode
@@ -41,7 +40,6 @@ class TemosLosses(Metric):
         loss_on_both = True
         force_loss_on_jfeats = True
         ablation_no_kl_combine = False
-        # ablation_no_kl_gaussian = False
         ablation_no_kl_gaussian = True
         ablation_no_motionencoder = False
 
@@ -91,13 +89,8 @@ class TemosLosses(Metric):
         for loss in losses:
             self.register_buffer(loss, torch.tensor(0.0))
         self.register_buffer("count", torch.tensor(0))
-        #     self.register_buffer(loss, default=torch.tensor(0.0), dist_reduce_fx="sum")
-        # self.register_buffer("count", default=torch.tensor(0), dist_reduce_fx="sum")
-        self.losses = losses
 
-        # Instantiate loss functions
-        # self._losses_func = {loss: hydra.utils.instantiate(kwargs[loss + "_func"])
-        #                      for loss in losses if loss != "total"}
+        self.losses = losses
         self._losses_func = {}
         self._params = {}
 
@@ -170,7 +163,6 @@ class TemosLosses(Metric):
 
         if self.use_infonce:
             if self.infonce_use_latent:
-                # print('use latent feature to calculate caontrastive loss')
                 total += self._update_loss("contrastive_infonce", (lat_text, lat_motion), emb_dist)
             else:
                 total += self._update_loss("contrastive_infonce", (dis_motion.loc, dis_text.loc), emb_dist)
