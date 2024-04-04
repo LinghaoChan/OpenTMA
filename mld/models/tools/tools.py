@@ -1,9 +1,30 @@
 import torch.nn as nn
 
 def remove_padding(tensors, lengths):
+    """
+    Inputs:
+        tensors (list): A list of tensors from which padding is to be removed.
+        lengths (list): A list of integers representing the actual lengths of the tensors.
+
+    This function removes padding from the tensors based on the actual lengths. 
+    It returns a list of tensors with padding removed.
+
+    Returns:
+        list: A list of tensors with padding removed.
+    """
     return [tensor[:tensor_length] for tensor, tensor_length in zip(tensors, lengths)]
 
 class AutoParams(nn.Module):
+    """
+    This class is a subclass of nn.Module. 
+    It is used to automatically set the parameters of a model. 
+    It has two types of parameters: needed parameters and optional parameters. 
+    Needed parameters must be provided when an instance of the class is created, 
+    otherwise a ValueError is raised. 
+    
+    Optional parameters can be provided when an instance of the class is created, 
+    otherwise they are set to their default values.
+    """
     def __init__(self, **kargs):
         try:
             for param in self.needed_params:
