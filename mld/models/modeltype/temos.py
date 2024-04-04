@@ -1,9 +1,6 @@
 from typing import List, Optional
 
 import torch
-
-# from hydra.utils import instantiate
-
 from torch import Tensor
 from omegaconf import DictConfig
 from mld.models.tools.tools import remove_padding
@@ -34,19 +31,18 @@ from transformers import AutoTokenizer, AutoModel
 
 
 class TEMOS(BaseModel):
-    # def __init__(self, textencoder: DictConfig,
-    #              motionencoder: DictConfig,
-    #              motiondecoder: DictConfig,
-    #              losses: DictConfig,
-    #              optim: DictConfig,
-    #              transforms: DictConfig,
-    #              nfeats: int,
-    #              vae: bool,
-    #              latent_dim: int,
-    #              **kwargs):
     def __init__(self, cfg, datamodule, **kwargs):
+        """
+        This class is used to define the TEMOS model.
+
+        Args:
+            cfg (Config): The configuration object.
+            datamodule (DataModule): The data module object.
+            **kwargs: Additional keyword arguments.
+        """
         super().__init__()
 
+        # Initialize the model parameters from the configuration.
         self.is_vae = cfg.model.vae
         self.cfg = cfg
         self.condition = cfg.model.condition
@@ -57,20 +53,11 @@ class TEMOS(BaseModel):
         self.motion_type = cfg.DATASET.MOTION_TYPE
 
         
+        # Instantiate the text encoder, motion encoder, and motion decoder from the configuration.
         self.textencoder = instantiate_from_config(cfg.textencoder)
-        # import pdb; pdb.set_trace()
         self.motionencoder = instantiate_from_config(cfg.motionencoder)
-
         self.motiondecoder = instantiate_from_config(cfg.motiondecoder)
 
-
-        # self.transforms = instantiate(transforms)
-        # self.Datastruct = self.transforms.Datastruct
-
-        # self.motiondecoder = instantiate(motiondecoder, nfeats=nfeats)
-
-        # self.optimizer = instantiate(optim, params=self.parameters())
-        # import pdb; pdb.set_trace()
         if self.condition in ["text", "text_uncond", 'text_all', 'text_face', 'text_body', 'text_hand', 'text_face_body', 'text_seperate', 'only_pose_concat', 'only_pose_fusion']:
             self._get_t2m_evaluator(cfg)
             self.feats2joints = datamodule.feats2joints
@@ -81,11 +68,8 @@ class TEMOS(BaseModel):
         else:
             raise NotImplementedError(
                 "Do not support other optimizer for now.")
-
-        # self._losses = torch.nn.ModuleDict({split: instantiate(losses, vae=vae,
-        #                                                        _recursive_=False)
-        #                                     for split in ["losses_train", "losses_test", "losses_val"]})
-
+            
+        # Initialize the losses for training, testing, and validation.
         self._losses = MetricCollection({
             split: TemosLosses(vae=self.is_vae, mode="xyz", cfg=cfg)
             for split in ["losses_train", "losses_test", "losses_val"]
@@ -93,20 +77,24 @@ class TEMOS(BaseModel):
 
         self.losses = {key: self._losses["losses_" + key] for key in ["train", "test", "val"]}
 
+        # Configure the metrics.
         self.metrics_dict = cfg.METRIC.TYPE
         self.configure_metrics()
 
         # If we want to overide it at testing time
         self.sample_mean = False
         self.fact = None
-        # import pdb; pdb.set_trace()
+        
+        # If the configuration specifies to use the InfoNCE filter, initialize the filter model.
         if self.cfg.LOSS.USE_INFONCE_FILTER:
             self.filter_model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
 
+        # Initialize the retrieval text embedding, motion embedding, and SBERT embedding lists.
         self.retrieval_text_embedding = []
         self.retrieval_motion_embedding = []
         self.retrieval_sbert_embedding = []
 
+        # Initialize the retrieval correspondence name.
         self.retrieval_corres_name = []
 
         self.gt_idx = 0
@@ -114,7 +102,18 @@ class TEMOS(BaseModel):
         self.__post_init__()
 
     # Forward: text => motion
-    def forward(self, batch: dict) -> List[Tensor]:
+    def forward(self, batch: dict):
+        """
+        This function is used to perform the forward pass of the model.
+
+        Args:
+            batch (dict): A dictionary containing the input batch.
+
+        Returns:
+            List[Tensor]: A list of tensors representing the output of the forward pass.
+        """
+        
+        # Perform the text-to-motion forward pass.
         datastruct_from_text = self.text_to_motion_forward(batch["text"],
                                                            batch["length"])
 
@@ -123,18 +122,21 @@ class TEMOS(BaseModel):
 
     def _get_t2m_evaluator(self, cfg):
         """
-        load T2M text encoder and motion encoder for evaluating
+        This function is used to load the Text-to-Motion (T2M) text encoder and motion encoder for evaluation.
+
+        Args:
+            cfg (Config): The configuration object.
         """
         
-        
-        # init module
+        # Initialize the T2M text encoder and motion encoder based on the configuration.
         if cfg.model.eval_text_source == 'token':
-
+            # If the evaluation text source is 'token', initialize the T2M text encoder with the specified parameters.
             self.t2m_textencoder = t2m_textenc.TextEncoderBiGRUCo(word_size=cfg.model.t2m_textencoder.dim_word,
                                         pos_size=cfg.model.t2m_textencoder.dim_pos_ohot,
                                         hidden_size=cfg.model.t2m_textencoder.dim_text_hidden,
                                         output_size=cfg.model.t2m_textencoder.dim_coemb_hidden,
                                        )
+        # If the evaluation text source is 'only_text_token', initialize the T2M text encoder with the specified parameters.
         elif cfg.model.eval_text_source == 'only_text_token':
             if "unimocap" in cfg.EVAL.DATASETS:
                 self.t2m_textencoder = t2m_textenc.TextEncoderBiGRUCoV2(word_size=cfg.model.t2m_textencoder.dim_word,
@@ -151,8 +153,6 @@ class TEMOS(BaseModel):
                                         )
 
         elif cfg.model.eval_text_source in ['caption']:
-
-
             if cfg.model.eval_text_encode_way == 'clip':
                 self.t2m_textencoder, clip_preprocess = clip.load("ViT-B/32", device=opt.device, jit=False)  # Must set jit=False for training
                 clip.model.convert_weights(text_enc)# Actually this line is unnecessary since clip by default already on float16
@@ -183,61 +183,21 @@ class TEMOS(BaseModel):
                                             )
             else:
                 raise NotImplementedError
-
         
-
+        # Initialize the T2M movement encoder and motion encoder with the specified parameters.
         self.t2m_moveencoder = t2m_motionenc.MovementConvEncoder(
             input_size=cfg.DATASET.NFEATS - 4,
             hidden_size=cfg.model.t2m_motionencoder.dim_move_hidden,
             output_size=cfg.model.t2m_motionencoder.dim_move_latent,
         )
 
-
         self.t2m_motionencoder = t2m_motionenc.MotionEncoderBiGRUCo(
             input_size=cfg.model.t2m_motionencoder.dim_move_latent,
             hidden_size=cfg.model.t2m_motionencoder.dim_motion_hidden,
             output_size=cfg.model.t2m_motionencoder.dim_motion_latent,
         )
-        
-        if self.cfg.LOSS.TRAIN_TMR:
-            # TMR retrival text evalutor
-            vae_dict = OrderedDict()
-            ckpt = "./deps/TMR-pretrained/TMR.ckpt"
-            state_dict = torch.load(ckpt)["state_dict"]
-            modelpath = 'distilbert-base-uncased'
-            self.t2m_TMR_textencoder = DistilbertActorAgnosticEncoder(modelpath, num_layers=4)
-            # print(model)
-            for k, v in state_dict.items():
-                # print(k)
-                if k.split(".")[0] == "textencoder":
-                    name = k.replace("textencoder.", "")
-                    vae_dict[name] = v
-            self.t2m_TMR_textencoder.load_state_dict(vae_dict, strict=True)
-            self.t2m_TMR_textencoder.eval()
-            del state_dict
-            for p in self.t2m_TMR_textencoder.parameters():
-                p.requires_grad = False
-            
-            # TMR retrival motion evalutor
-            vae_dict = OrderedDict()
-            ckpt = "./deps/TMR-pretrained/TMR.ckpt"
-            state_dict = torch.load(ckpt)["state_dict"]
-            self.t2m_TMR_motionencoder = ActorAgnosticEncoder(nfeats=263, vae =True, num_layers=4)
-            # print(model)
-            for k, v in state_dict.items():
-                # print(k)
-                if k.split(".")[0] == "motionencoder":
-                    name = k.replace("motionencoder.", "")
-                    vae_dict[name] = v
-            self.t2m_TMR_motionencoder.load_state_dict(vae_dict, strict=True)
-            self.t2m_TMR_motionencoder.eval()
-            del state_dict
-            for p in self.t2m_TMR_motionencoder.parameters():
-                p.requires_grad = False
 
-
-
-        # load pretrianed
+        # Load the pretrained T2M model.
         dataname = cfg.TEST.DATASETS[0]
         dataname = "t2m" if dataname == "humanml3d" else dataname
 
@@ -249,17 +209,16 @@ class TEMOS(BaseModel):
             t2m_checkpoint = torch.load(
                 os.path.join(cfg.model.t2m_path, dataname,
                             "text_mot_match/model/finest.tar"),  map_location=torch.device('cpu'))
-        # import pdb; pdb.set_trace()
+
         self.t2m_textencoder.load_state_dict(t2m_checkpoint["text_encoder"])
         
         self.t2m_moveencoder.load_state_dict(
             t2m_checkpoint["movement_encoder"])
 
-
         self.t2m_motionencoder.load_state_dict(
             t2m_checkpoint["motion_encoder"])
 
-        # freeze params
+        # Set the T2M text encoder, movement encoder, and motion encoder to evaluation mode and freeze their parameters.
         self.t2m_textencoder.eval()
         self.t2m_moveencoder.eval()
         self.t2m_motionencoder.eval()
@@ -270,11 +229,22 @@ class TEMOS(BaseModel):
         for p in self.t2m_motionencoder.parameters():
             p.requires_grad = False
 
-        
-
+    
     def sample_from_distribution(self, distribution: Distribution, *,
                                  fact: Optional[bool] = None,
-                                 sample_mean: Optional[bool] = False) -> Tensor:
+                                 sample_mean: Optional[bool] = False):
+        """
+        This function samples from a given distribution. If `sample_mean` is True, it returns the mean of the distribution.
+        If `fact` is provided, it rescales the sample using the reparameterization trick.
+
+        Args:
+            distribution (Distribution): The distribution to sample from.
+            fact (Optional[bool]): A factor to rescale the sample. Default is None.
+            sample_mean (Optional[bool]): Whether to return the mean of the distribution. Default is False.
+
+        Returns:
+            Tensor: The sampled tensor.
+        """
         fact = fact if fact is not None else self.fact
         sample_mean = sample_mean if sample_mean is not None else self.sample_mean
 
@@ -292,6 +262,20 @@ class TEMOS(BaseModel):
 
     def text_to_motion_forward(self, text_sentences: List[str], lengths: List[int], *,
                                return_latent: bool = False):
+        """
+        This function encodes the given text sentences into a latent space and then decodes them into a motion.
+        If `return_latent` is True, it also returns the latent vector and the distribution.
+
+        Args:
+            text_sentences (List[str]): The text sentences to encode.
+            lengths (List[int]): The lengths of the text sentences.
+            return_latent (bool): Whether to return the latent vector and the distribution. Default is False.
+
+        Returns:
+            Tensor: The decoded motion.
+            Tensor: The latent vector. Only returned if `return_latent` is True.
+            Distribution: The distribution. Only returned if `return_latent` is True.
+        """
         # Encode the text to the latent space
         if self.is_vae:
             distribution = self.textencoder(text_sentences)
@@ -302,22 +286,37 @@ class TEMOS(BaseModel):
 
         # Decode the latent vector to a motion
         features = self.motiondecoder(latent_vector, lengths)
-        # datastruct = self.Datastruct(features=features)
 
         if not return_latent:
             return features
         return features, latent_vector, distribution
 
-    def motion_to_motion_forward(self, features,
+    def motion_to_motion_forward(self, 
+                                 features, 
                                  lengths: Optional[List[int]] = None,
                                  return_latent: bool = False,
                                  mask_ratio=0,
                                  ):
-        # Make sure it is on the good device
-        # datastruct.transforms = self.transforms
+        """
+        This function encodes the given motion features into a latent space and then decodes them into a motion.
+        If `return_latent` is True, it also returns the latent vector and the distribution.
+        If `mask_ratio` is greater than 0, it masks a portion of the features before encoding.
 
+        Args:
+            features (Tensor): The motion features to encode.
+            lengths (Optional[List[int]]): The lengths of the motion features. Default is None.
+            return_latent (bool): Whether to return the latent vector and the distribution. Default is False.
+            mask_ratio (float): The ratio of features to mask. Default is 0.
+
+        Returns:
+            features (Tensor): The decoded motion.
+            latent_vector (Tensor): The latent vector. Only returned if `return_latent` is True.
+            Distribution: The distribution. Only returned if `return_latent` is True.
+        """
+        
         # Encode the motion to the latent space
-        # mask_ratio = 0
+        # Behaves differently based on whether the class is set to use a VAE or not, 
+        # and whether a mask ratio is provided.
         if self.is_vae:
             if mask_ratio<0.001:
                 distribution = self.motionencoder(features, lengths)
@@ -353,7 +352,6 @@ class TEMOS(BaseModel):
                 
         # Decode the latent vector to a motion
         features = self.motiondecoder(latent_vector, lengths)
-        # datastruct = self.Datastruct(features=features)
 
         if not return_latent:
             return features
@@ -361,11 +359,30 @@ class TEMOS(BaseModel):
 
 
     def save_embeddings(self, batch):
+        """
+        This function saves the embeddings of the text and motion data in the batch. 
+        It also saves the embeddings of the text data filtered through the Sentence-BERT model if the USE_INFONCE_FILTER flag is set.
+
+        Args:
+            batch (dict): The batch of data. It should contain the following keys:
+                - "text": The text data.
+                - "motion": The motion data.
+                - "length": The lengths of the motion data.
+                - "word_embs": The word embeddings of the text data.
+                - "pos_ohot": The one-hot encoded positions of the words in the text data.
+                - "text_len": The lengths of the text data.
+                - "retrieval_name": The names of the retrieval data.
+
+        Returns:
+            None. The embeddings are saved in the instance variables `retrieval_sbert_embedding`, `retrieval_text_embedding`, `retrieval_motion_embedding`, and `retrieval_corres_name`.
+        """
         
         with torch.no_grad():
+            # Initialize the variables to store the embeddings
             motion_all, text_all = None, None
             sbert_embedding_all = None
             
+            # Extract the data from the batch
             texts = batch["text"]
             motions = batch["motion"].detach().clone()
             lengths = batch["length"]
@@ -374,11 +391,14 @@ class TEMOS(BaseModel):
             text_lengths = batch["text_len"].detach().clone()
             retrieval_name = batch['retrieval_name']
 
-            # import pdb; pdb.set_trace()
+            # Compute the text embeddings
             text_embedding = self.textencoder(texts).loc # (bs, 256)
+            
+            # Compute the motion embeddings, with optional masking
             if self.mr < 0.001:
                 motion_embedding = self.motionencoder(motions, lengths).loc # (bs, 256)
             else:
+                # Compute the mask
                 num_mask = int(motions.shape[1] * self.mr)
                 mask = np.hstack([
                     np.zeros(num_mask, dtype=bool), np.ones(motions.shape[1] - num_mask)
@@ -387,12 +407,15 @@ class TEMOS(BaseModel):
                 mask_shuffle = torch.tensor(mask, dtype=torch.bool)
                 masked_features = motions[:, mask_shuffle, :]
                 
+                # Compute the new lengths
                 lengths_new = [int(mask_shuffle[:lengths[i]].sum()) for i in range(len(lengths))]
                 motion_embedding = self.motionencoder(masked_features, lengths_new).loc
             
+            # Normalize the embeddings
             Emb_text = f.normalize(text_embedding, dim=1)
             Emb_motion = f.normalize(motion_embedding, dim=1)
 
+            # Concatenate the embeddings
             if text_all == None:
                 text_all = Emb_text
             else:
@@ -403,6 +426,7 @@ class TEMOS(BaseModel):
             else:
                 motion_all = torch.cat((motion_all, Emb_motion), 0)
 
+            # Compute and concatenate the Sentence-BERT embeddings if the USE_INFONCE_FILTER flag is set
             if self.cfg.LOSS.USE_INFONCE_FILTER:
                 sbert_embedding = torch.tensor(self.filter_model.encode(texts)) # (bs, 384)
                 sbert_embedding = f.normalize(sbert_embedding, dim=1)
@@ -411,22 +435,44 @@ class TEMOS(BaseModel):
                     sbert_embedding_all = sbert_embedding
                 else:
                     sbert_embedding_all = torch.cat((sbert_embedding_all, sbert_embedding), 0)
-            # import pdb; pdb.set_trace()
 
                 self.retrieval_sbert_embedding.append(sbert_embedding_all.detach().cpu().numpy())
 
+            # Save the embeddings with merging into the list
             self.retrieval_text_embedding.append(text_all.detach().cpu().numpy())
             self.retrieval_motion_embedding.append(motion_all.detach().cpu().numpy())
-            self.retrieval_corres_name.append(retrieval_name)
-            
-            
-
-
-
+            self.retrieval_corres_name.append(retrieval_name)    
 
 
     def t2m_eval(self, batch):
-        # import pdb; pdb.set_trace()
+        """
+        This function evaluates the text-to-motion (t2m) model on a batch of data.
+
+        Args:
+            batch (dict): The batch of data. It should contain the following keys:
+                - "retrieval_name": The names of the retrieval data.
+                - "text": The text data.
+                - "motion": The motion data.
+                - "length": The lengths of the motion data.
+                - "word_embs": The word embeddings of the text data.
+                - "pos_ohot": The one-hot encoded positions of the words in the text data.
+                - "text_len": The lengths of the text data.
+
+        Returns:
+            rs_set (dict): A dictionary containing the following keys:
+                - "m_ref": The reference motion data.
+                - "m_rst": The reconstructed motion data.
+                - "lat_t": The text embeddings.
+                - "lat_m": The motion embeddings.
+                - "lat_rm": The reconstructed motion embeddings.
+                - "joints_ref": The reference joint data.
+                - "joints_rst": The reconstructed joint data.
+                - "TMR_motion_embedding": The motion embeddings from the TMR model.
+                - "TMR_GT_motion_embedding": The ground truth motion embeddings from the TMR model.
+                - "TMR_text_embedding": The text embeddings from the TMR model.
+        """
+        
+        # Extract the data from the batch
         retrieval_name = batch['retrieval_name']
         texts = batch["text"]
         motions = batch["motion"].detach().clone()
@@ -438,6 +484,7 @@ class TEMOS(BaseModel):
         # start
         start = time.time()
 
+        # If the data module is multimodal, repeat the data
         if self.trainer.datamodule.is_mm:
             texts = texts * self.cfg.TEST.MM_NUM_REPEATS
             motions = motions.repeat_interleave(self.cfg.TEST.MM_NUM_REPEATS,
@@ -450,34 +497,14 @@ class TEMOS(BaseModel):
             text_lengths = text_lengths.repeat_interleave(
                 self.cfg.TEST.MM_NUM_REPEATS, dim=0)
 
-        # if self.stage in ['diffusion', 'vae_diffusion']:
-        #     # diffusion reverse
-        #     if self.do_classifier_free_guidance:
-        #         uncond_tokens = [""] * len(texts)
-        #         if self.condition == 'text':
-        #             uncond_tokens.extend(texts)
-        #         elif self.condition == 'text_uncond':
-        #             uncond_tokens.extend(uncond_tokens)
-        #         texts = uncond_tokens
-        #     text_emb = self.text_encoder(texts)
-        #     z = self._diffusion_reverse(text_emb, lengths)
-        # elif self.stage in ['vae']:
-        #     if self.vae_type in ["mld", "vposert", "actor"]:
-        #         z, dist_m = self.vae.encode(motions, lengths)
-        #     else:
-        #         raise TypeError("Not supported vae type!")
-        #     if self.condition in ['text_uncond']:
-        #         # uncond random sample
-        #         z = torch.randn_like(z)
-
-
+        # Ensure that the stage is 'temos'
         assert self.stage in ['temos']
 
-        # import pdb; pdb.set_trace()
         # Encode the text/decode to a motion 
         gt_motion = motions.clone()
         gt_lengths = lengths[:]
         gt_texts = texts[:]
+        
         with torch.no_grad():
             rett = self.text_to_motion_forward(texts,
                                             lengths,
@@ -490,11 +517,6 @@ class TEMOS(BaseModel):
                                                 return_latent=True)
             feat_from_motion, latent_from_motion, distribution_from_motion = retm
         clone_feat_from_text = feat_from_text.clone()
-        # with torch.no_grad():
-        #     if self.vae_type in ["mld", "vposert", "actor"]:
-        #         feats_rst = self.vae.decode(z, lengths)
-        #     elif self.vae_type == "no":
-        #         feats_rst = z.permute(1, 0, 2)
 
         # end time
         end = time.time()
@@ -504,22 +526,10 @@ class TEMOS(BaseModel):
         joints_rst = self.feats2joints(feat_from_text, self.cfg.DATASET.MOTION_TYPE)
         joints_ref = self.feats2joints(motions, self.cfg.DATASET.MOTION_TYPE)
 
-        # import pdb; pdb.set_trace()
-        # for i in range(joints_ref.shape[0]):
-        #     np.save(os.path.join("/comp_robot/lushunlin/motion-latent-diffusion/retrieval/test_motion_debug", '{:0{width}}.npy'.format(self.gt_idx, width=5)), joints_ref[i][:lengths[i],].detach().cpu().numpy())
-        #     # np.save(os.path.join("/comp_robot/lushunlin/motion-latent-diffusion/retrieval/test_motion", '{:0{width}}.npy'.format(self.gt_idx, width=5)), joints_ref[0][:lengths[0],].detach().cpu().numpy())
-        #     with open(os.path.join("/comp_robot/lushunlin/motion-latent-diffusion/retrieval/test_text_debug", '{:0{width}}.txt'.format(self.gt_idx, width=5)), "w") as test_file:
-        #         test_file.write(texts[i])
-        #     with open(os.path.join("/comp_robot/lushunlin/motion-latent-diffusion/retrieval/test_name_debug", '{:0{width}}.txt'.format(self.gt_idx, width=5)), "w") as test_name_file:
-        #         test_name_file.write(retrieval_name[i])
-        #     self.gt_idx += 1
-
-        
-
         # renorm for t2m evaluators
         feats_rst = self.datamodule.renorm4t2m(feat_from_text)
         motions = self.datamodule.renorm4t2m(motions)
-        # import pdb; pdb.set_trace()
+        
         # t2m motion encoder
         m_lens = lengths.copy()
         m_lens = torch.tensor(m_lens, device=motions.device)
@@ -533,16 +543,9 @@ class TEMOS(BaseModel):
 
         TMR_motion_embedding = None
         TMR_GT_motion_embedding = None
-        TMR_text_embedding = None    
-        if self.cfg.LOSS.TRAIN_TMR:
-            # import pdb; pdb.set_trace()
-            # 可能是这里的问题
-            
-            # TMR_motion_embedding = self.t2m_TMR_motionencoder(feat_from_text.detach(), lengths).loc.detach()
-            TMR_motion_embedding = self.t2m_TMR_motionencoder(feat_from_motion.detach(), lengths).loc.detach()
-            TMR_GT_motion_embedding = self.t2m_TMR_motionencoder(gt_motion.detach(), lengths).loc.detach()
-            TMR_text_embedding = self.t2m_TMR_textencoder(texts).loc.detach()
+        TMR_text_embedding = None
         
+        # Compute the reconstructed motion embeddings
         recons_mov = self.t2m_moveencoder(feats_rst[..., :-4]).detach()
         recons_emb = self.t2m_motionencoder(recons_mov, m_lens)
         motion_mov = self.t2m_moveencoder(motions[..., :-4]).detach()
@@ -575,7 +578,6 @@ class TEMOS(BaseModel):
             "joints_rst": joints_rst,
             "TMR_motion_embedding": TMR_motion_embedding,
             "TMR_GT_motion_embedding": TMR_GT_motion_embedding,
-            # "TMR_GT_motion_embedding": distribution_from_text.loc,
             "TMR_text_embedding": TMR_text_embedding,
         }
         return rs_set
@@ -583,8 +585,9 @@ class TEMOS(BaseModel):
     def allsplit_step(self, split: str, batch, batch_idx):
 
         emb_dist = None
+        # If the configuration specifies to use InfoNCE loss and filter, it
+        # calculate the embedding distance.
         if self.cfg.LOSS.USE_INFONCE and self.cfg.LOSS.USE_INFONCE_FILTER:
-            # import pdb ;pdb.set_trace()
             with torch.no_grad():
                 text_embedding = self.filter_model.encode(batch["text"])
                 text_embedding = torch.tensor(text_embedding).to(batch['motion'][0])
@@ -611,31 +614,19 @@ class TEMOS(BaseModel):
                                                 return_latent=True,
                                                 mask_ratio=mr)
             
+        # Unpack the returned values
         feat_from_motion, latent_from_motion, distribution_from_motion = ret
         
         sync = self.cfg.LOSS.SYNC
         TMR_motion_embedding = None
         TMR_text_embedding = None
-        # if sync:
-        #     sync_ret_text = self.motion_to_motion_forward(
-        #                                     feat_from_text,
-        #                                     batch["length"],
-        #                                     return_latent=True,
-        #                                     mask_ratio=0,
-        #                                 )
-        #     feat_from_text_sync, latent_from_text_sync, distribution_from_text_sync = sync_ret_text
-        # else:
-        #     feat_from_text_sync, latent_from_text_sync, distribution_from_text_sync, sync_ret_text = None, None, None, None
-        if sync: 
+        
+        # If the configuration specifies to synchronize the embeddings,
+        # calculate the TMR embeddings.
+       if sync: 
             TMR_motion_embedding = self.t2m_TMR_motionencoder(feat_from_text, batch["length"]).loc
-            # TMR_motion_embedding = self.t2m_TMR_motionencoder(feat_from_motion, batch["length"]).loc
             TMR_text_embedding = self.t2m_TMR_textencoder(batch["text"]).loc
         
-        
-        # import pdb; pdb.set_trace()
-        # GT data
-        # datastruct_ref = batch["datastruct"]
-
         # Compare to a Normal distribution
         if self.is_vae:
             # Create a centred normal distribution to compare with
@@ -644,7 +635,7 @@ class TEMOS(BaseModel):
             distribution_ref = torch.distributions.Normal(mu_ref, scale_ref)
         else:
             distribution_ref = None
-        # import pdb; pdb.set_trace()
+        
         # Compute the losses
         loss = self.losses[split].update(f_text=feat_from_text,
                                          f_motion=feat_from_motion,
@@ -663,8 +654,7 @@ class TEMOS(BaseModel):
             raise ValueError("Loss is None, this happend with torchmetrics > 0.7")
 
         # Compute the metrics - currently evaluate results from text to motion
-        
-        
+        # The metrics are computed differently depending on the split and the condition
         if split in ["val", "test"]:
             self.save_embeddings(batch)
             
@@ -677,13 +667,12 @@ class TEMOS(BaseModel):
             else:
                 raise NotImplementedError
 
-            # import pdb; pdb.set_trace()
             # MultiModality evaluation sperately
             if self.trainer.datamodule.is_mm:
                 metrics_dicts = ['MMMetrics']
             else:
                 metrics_dicts = self.metrics_dict
-            # import pdb; pdb.set_trace()
+            
             for metric in metrics_dicts:
                 if metric == "TemosMetric":
                     phase = split if split != "val" else "eval"
@@ -703,10 +692,6 @@ class TEMOS(BaseModel):
                                                  batch["length"])
                 elif metric == "TM2TMetrics":
                     getattr(self, metric).update(
-                        # lat_t, latent encoded from diffusion-based text
-                        # lat_rm, latent encoded from reconstructed motion
-                        # lat_m, latent encoded from gt motion
-                        # rs_set['lat_t'], rs_set['lat_rm'], rs_set['lat_m'], batch["length"])
                         rs_set['lat_t'],
                         rs_set["lat_rm"],
                         rs_set["lat_m"],
@@ -733,26 +718,17 @@ class TEMOS(BaseModel):
                                                  rs_set["joints_eval_rst"],
                                                  rs_set["joints_eval_ref"],
                                                  rs_set["m_lens"])
-                elif metric == "UESTCMetrics":
-                    # the stgcn model expects rotations only
-                    getattr(self, metric).update(
-                        rs_set["m_action"],
-                        rs_set["m_rst"].view(*rs_set["m_rst"].shape[:-1], 6,
-                                             25).permute(0, 3, 2, 1)[:, :-1],
-                        rs_set["m_ref"].view(*rs_set["m_ref"].shape[:-1], 6,
-                                             25).permute(0, 3, 2, 1)[:, :-1],
-                        rs_set["m_lens"])
+                
                 else:
                     raise TypeError(f"Not support this metric {metric}")
 
 
+        # If the split is "test", return the results depending on the motion type
         if split in ["test"]:
             if self.motion_type == 'vector_263':
-                # import pdb; pdb.set_trace()
                 return rs_set["joints_rst"], batch["length"], batch["text"]
             elif self.motion_type == 'smplx_212':
                 if self.cfg.TRAIN.use_joints:
-                    # import pdb; pdb.set_trace()
                     return rs_set["m_rst"], batch["length"], rs_set["m_ref"]
                 else:
                     return batch["length"]
@@ -761,27 +737,14 @@ class TEMOS(BaseModel):
 
 
     def allsplit_epoch_end(self, split: str, outputs):
+        
+        # Initialize an empty dictionary to store the results
         dico = {}
-
+        
+        # If the split is "val" or "test", save the embeddings every 100 epochs
         if split in ["val", "test"]:
-            
-            
-
-            # import pdb; pdb.set_trace()
             if (self.trainer.current_epoch+1) % 100 == 0:
-            # if True:
-                # import pdb; pdb.set_trace()
-                # output_dir = Path(
-                #     os.path.join(
-                #         self.cfg.FOLDER,
-                #         str(self.cfg.model.model_type),
-                #         str(self.cfg.NAME),
-                #         "embeddings",
-                #         split,
-                #         "epoch_" + str(self.trainer.current_epoch)
-                #     ))
-
-
+                # Define the directory where the embeddings will be saved
                 output_dir = Path(
                     os.path.join(
                         self.cfg.FOLDER,
@@ -794,46 +757,39 @@ class TEMOS(BaseModel):
                 
                 os.makedirs(output_dir, exist_ok=True)
                 
-                # import pdb; pdb.set_trace()
-                
-                # [i.squeeze() for i in self.all_gather(self.retrieval_text_embedding)]
-                # print('self.retrieval_text_embedding length: ', len(self.retrieval_text_embedding))
-                # print('self.retrieval_text_embedding type: ', type(self.retrieval_text_embedding))
-                # print('self.all_gather(self.retrieval_text_embedding) length', len(self.all_gather(self.retrieval_text_embedding)))
-                # print('self.all_gather(self.retrieval_text_embedding) type', type(self.all_gather(self.retrieval_text_embedding)))
-                # print(self.all_gather(self.retrieval_text_embedding)[0].shape)
-                # print('++++++++++++++')
-                # print('self.retrieval_text_embedding hou shape', torch.cat([i.view(-1, i.shape[-1]) for i in self.all_gather(self.retrieval_text_embedding)], dim=0).shape)
+                # Concatenate all the text and motion embeddings across all devices
                 self.retrieval_text_embedding = torch.cat([i.view(-1, i.shape[-1]) for i in self.all_gather(self.retrieval_text_embedding)], dim=0)
                 self.retrieval_motion_embedding = torch.cat([i.view(-1, i.shape[-1]) for i in self.all_gather(self.retrieval_motion_embedding)], dim=0)
                 
-
+                # Concatenate all the corresponding names across all devices
                 tmp_retrieval_name = []
                 for i in self.all_gather(self.retrieval_corres_name):
                     tmp_retrieval_name += i
-                self.retrieval_corres_name = tmp_retrieval_name
+                self._retrieval_corres_name = tmp_retrieval_name
+
+                # Save the corresponding names to a text file
                 with open(output_dir/"test_name_debug.txt", "w") as test_name_file:
-                    for i in self.retrieval_corres_name:
+                    for i in self._retrieval_corres_name:
                         test_name_file.write(i + '\n')
                 
-                # self.retrieval_corres_name = [tmp_retrieval_name + i for i in self.all_gather(self.retrieval_corres_name)]
-
+                # If the InfoNCE filter is used, concatenate all the sbert embeddings across all devices and save them
                 if self.cfg.LOSS.USE_INFONCE_FILTER:
                     self.retrieval_sbert_embedding = torch.cat([i.view(-1, i.shape[-1]) for i in self.all_gather(self.retrieval_sbert_embedding)], dim=0)
                     np.save(output_dir/"sbert_embedding.npy", self.retrieval_sbert_embedding.detach().cpu().numpy())
 
-
-                
+                # Save the text and motion embeddings
                 np.save(output_dir/"text_embedding.npy", self.retrieval_text_embedding.detach().cpu().numpy())# (2324, 256)
                 np.save(output_dir/"motion_embedding.npy", self.retrieval_motion_embedding.detach().cpu().numpy())
 
                 print('save embedding in {} at {}'.format(output_dir, self.trainer.current_epoch))
                 
-            # import pdb; pdb.set_trace()
+            # Reset the embeddings and the corresponding names
             self.retrieval_text_embedding = []
             self.retrieval_motion_embedding = []
             self.retrieval_sbert_embedding = []
+            self.retrieval_corres_name = []
 
+        # If the split is "train" or "val", compute and log the losses
         if split in ["train", "val"]:
             losses = self.losses[split]
             loss_dict = losses.compute(split)
@@ -843,6 +799,7 @@ class TEMOS(BaseModel):
                 for loss, value in loss_dict.items() if not torch.isnan(value)
             })
 
+        # If the split is "val" or "test", compute and log the metrics
         if split in ["val", "test"]:
 
             if self.trainer.datamodule.is_mm and "TM2TMetrics" in self.metrics_dict:
@@ -859,15 +816,19 @@ class TEMOS(BaseModel):
                     f"Metrics/{metric}": value.item()
                     for metric, value in metrics_dict.items()
                 })
+
+        # If the split is not "test", log the current epoch and step
         if split != "test":
             dico.update({
                 "epoch": float(self.trainer.current_epoch),
                 "step": float(self.trainer.current_epoch),
             })
+        
         # don't write sanity check into log
         if not self.trainer.sanity_checking:
             self.log_dict(dico, sync_dist=True, rank_zero_only=True)
 
+    # This function is called at the end of each training epoch
+    # It simply calls the allsplit_epoch_end function with the split set to "train"
     def training_epoch_end(self, outputs):
-        # import pdb; pdb.set_trace()
         return self.allsplit_epoch_end("train", outputs)
