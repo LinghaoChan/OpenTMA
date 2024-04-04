@@ -84,14 +84,6 @@ class TM2TMetrics(Metric):
             
         self.metrics.extend(self.Matching_metrics)
 
-        # Fid
-        self.add_state("FID", default=torch.tensor(0.0), dist_reduce_fx="sum")
-        self.metrics.append("FID")
-        
-        if self.use_TMR:
-            # TMR_Fid
-            self.add_state("TMR_FID", default=torch.tensor(0.0), dist_reduce_fx="sum")
-            self.metrics.append("TMR_FID")
 
         # Diversity
         self.add_state("Diversity",
@@ -139,11 +131,10 @@ class TM2TMetrics(Metric):
                                     axis=0).cpu()[shuffle_idx, :]
             TMR_all_gtmotions = torch.cat(self.TMR_gtmotion_embeddings,
                                     axis=0).cpu()[shuffle_idx, :]
-        # import pdb; pdb.set_trace()
+
         # Compute r-precision
         assert count_seq > self.R_size
-        # print("**********************************")
-        # print(count_seq)
+        
         top_k_mat = torch.zeros((self.top_k, ))
         TMR_top_k_mat = torch.zeros((self.top_k, ))
         for i in range(count_seq // self.R_size):
@@ -158,8 +149,7 @@ class TM2TMetrics(Metric):
                 # [bs=32, 1*256]
                 TMR_group_motions = F.normalize(TMR_all_genmotions[i * self.R_size:(i + 1) *
                                             self.R_size])
-            # dist_mat = pairwise_euclidean_distance(group_texts, group_motions)
-            # [bs=32, 32]
+
             dist_mat = euclidean_distance_matrix(group_texts,
                                                  group_motions).nan_to_num()
             if self.use_TMR:
@@ -184,7 +174,6 @@ class TM2TMetrics(Metric):
             if self.use_TMR:
                 metrics[f"TMR_R_precision_top_{str(k+1)}"] = TMR_top_k_mat[k] / R_count
 
-        # import pdb; pdb.set_trace()
         # Compute r-precision with gt
         assert count_seq > self.R_size
         top_k_mat = torch.zeros((self.top_k, ))
@@ -220,12 +209,11 @@ class TM2TMetrics(Metric):
         metrics["gt_Matching_score"] = self.gt_Matching_score / R_count
         if self.use_TMR:
             metrics["TMR_gt_Matching_score"] = self.TMR_gt_Matching_score / R_count
-        # import pdb; pdb.set_trace()
+       
         for k in range(self.top_k):
             metrics[f"gt_R_precision_top_{str(k+1)}"] = top_k_mat[k] / R_count
             if self.use_TMR:
                 metrics[f"TMR_gt_R_precision_top_{str(k+1)}"] = TMR_top_k_mat[k] / R_count
-            # print(metrics[f"TMR_gt_R_precision_top_{str(k+1)}"])
 
         # tensor -> numpy for FID
         all_genmotions = all_genmotions.numpy()
@@ -236,17 +224,11 @@ class TM2TMetrics(Metric):
 
         # Compute fid
         mu, cov = calculate_activation_statistics_np(all_genmotions)
-        # gt_mu, gt_cov = calculate_activation_statistics_np(all_gtmotions)
-        # import pdb; pdb.set_trace()
         gt_mu, gt_cov = calculate_activation_statistics_np(all_gtmotions)
-        metrics["FID"] = calculate_frechet_distance_np(gt_mu, gt_cov, mu, cov)
         
         if self.use_TMR:
             TMR_mu, TMR_cov = calculate_activation_statistics_np(TMR_all_genmotions)
-            # gt_mu, gt_cov = calculate_activation_statistics_np(all_gtmotions)
-            # import pdb; pdb.set_trace()
             TMR_gt_mu, TMR_gt_cov = calculate_activation_statistics_np(TMR_all_gtmotions)
-            metrics["TMR_FID"] = calculate_frechet_distance_np(TMR_gt_mu, TMR_gt_cov, TMR_mu, TMR_cov)
 
         # Compute diversity
         assert count_seq > self.diversity_times
@@ -267,7 +249,7 @@ class TM2TMetrics(Metric):
         TMR_GT_motion_embedding = None,
         TMR_text_embedding = None,
     ):
-        # import pdb; pdb.set_trace()
+        
         self.count += sum(lengths)
         self.count_seq += len(lengths)
 

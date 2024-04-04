@@ -13,51 +13,76 @@ from .utils import l2_norm, variance
 
 
 class ComputeMetrics(Metric):
-
+    """
+    This class is used to compute metrics. It extends the Metric class.
+    """
+    
     def __init__(self,
                  njoints,
                  jointstype: str = "mmm",
                  force_in_meter: bool = True,
                  dist_sync_on_step=True,
                  **kwargs):
+        """
+        This is the constructor for the ComputeMetrics class.
+
+        Inputs:
+        - njoints: the number of joints
+        - jointstype: the type of joints, default is "mmm"
+        - force_in_meter: a boolean indicating whether to force in meter, default is True
+        - dist_sync_on_step: a boolean indicating whether to synchronize on step, default is True
+        - kwargs: additional keyword arguments
+
+        Outputs: None
+        """
         super().__init__(dist_sync_on_step=dist_sync_on_step)
 
+        # Check if the jointstype is valid
         if jointstype not in ["mmm", "humanml3d", "motionx"]:
             print(jointstype)
             raise NotImplementedError("This jointstype is not implemented.")
 
+        # Initialize the name, jointstype, and rifke attributes
         self.name = 'APE and AVE'
         self.jointstype = jointstype
         self.rifke = Rifke(jointstype=jointstype, normalization=False)
 
         self.force_in_meter = force_in_meter
+        
+        # Initialize the count and count_seq states
         self.add_state("count", default=torch.tensor(0), dist_reduce_fx="sum")
         self.add_state("count_seq",
                        default=torch.tensor(0),
                        dist_reduce_fx="sum")
 
-        # APE
+        # Initialize the APE_root and APE_traj states
         self.add_state("APE_root",
                        default=torch.tensor(0.),
                        dist_reduce_fx="sum")
         self.add_state("APE_traj",
                        default=torch.tensor(0.),
                        dist_reduce_fx="sum")
+        
+        # Initialize the APE_root and APE_traj states
         self.add_state("APE_pose",
                        default=torch.zeros(njoints - 1),
                        dist_reduce_fx="sum")
         self.add_state("APE_joints",
                        default=torch.zeros(njoints),
                        dist_reduce_fx="sum")
+        
+        # Define the list of APE metrics
         self.APE_metrics = ["APE_root", "APE_traj", "APE_pose", "APE_joints"]
 
-        # AVE
+        # Initialize the AVE_root and AVE_traj states
         self.add_state("AVE_root",
                        default=torch.tensor(0.),
                        dist_reduce_fx="sum")
         self.add_state("AVE_traj",
                        default=torch.tensor(0.),
                        dist_reduce_fx="sum")
+        
+        # Initialize the AVE_pose and AVE_joints states
         self.add_state("AVE_pose",
                        default=torch.zeros(njoints - 1),
                        dist_reduce_fx="sum")
@@ -66,10 +91,20 @@ class ComputeMetrics(Metric):
                        dist_reduce_fx="sum")
         self.AVE_metrics = ["AVE_root", "AVE_traj", "AVE_pose", "AVE_joints"]
 
-        # All metric
+        # Combine all metrics into a single list
         self.metrics = self.APE_metrics + self.AVE_metrics
 
     def compute(self, sanity_flag):
+        """
+        This method computes the metrics.
+
+        Inputs:
+        - sanity_flag: a flag used for sanity checks
+
+        Outputs:
+        - A dictionary containing the computed APE and AVE metrics
+        """
+        # Compute the APE metrics
         count = self.count
         APE_metrics = {
             metric: getattr(self, metric) / count
@@ -84,6 +119,7 @@ class ComputeMetrics(Metric):
         APE_metrics.pop("APE_pose")
         APE_metrics.pop("APE_joints")
 
+        # Compute the AVE metrics
         count_seq = self.count_seq
         AVE_metrics = {
             metric: getattr(self, metric) / count_seq
@@ -101,20 +137,35 @@ class ComputeMetrics(Metric):
         return {**APE_metrics, **AVE_metrics}
 
     def update(self, jts_text: Tensor, jts_ref: Tensor, lengths: List[int]):
+        """
+        This method updates the metrics.
+
+        Inputs:
+        - jts_text: a tensor representing the text
+        - jts_ref: a tensor representing the reference
+        - lengths: a list of integers representing the lengths
+
+        Outputs: None
+        """
+        
+        # Update the count and count_seq variables
         self.count += sum(lengths)
         self.count_seq += len(lengths)
 
+        # Transform the text and reference tensors
         jts_text, poses_text, root_text, traj_text = self.transform(
             jts_text, lengths)
         jts_ref, poses_ref, root_ref, traj_ref = self.transform(
             jts_ref, lengths)
 
         for i in range(len(lengths)):
+            # Compute the APE metrics
             self.APE_root += l2_norm(root_text[i], root_ref[i], dim=1).sum()
             self.APE_pose += l2_norm(poses_text[i], poses_ref[i], dim=2).sum(0)
             self.APE_traj += l2_norm(traj_text[i], traj_ref[i], dim=1).sum()
             self.APE_joints += l2_norm(jts_text[i], jts_ref[i], dim=2).sum(0)
 
+            # Compute the variance for the root, trajectory, poses, and joints
             root_sigma_text = variance(root_text[i], lengths[i], dim=0)
             root_sigma_ref = variance(root_ref[i], lengths[i], dim=0)
             self.AVE_root += l2_norm(root_sigma_text, root_sigma_ref, dim=0)
@@ -186,7 +237,8 @@ class ComputeMetrics(Metric):
             elif self.jointstype == 'humanml3d':
                 factor = 1000.0 * 0.75 / 480.0
             elif self.jointstype == 'motionx':
-                factor = 1000.0 
+                factor = 1000.0
+            
             # return results in meters
             return (remove_padding(poses / factor, lengths),
                     remove_padding(poses_local / factor, lengths),
