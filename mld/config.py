@@ -91,7 +91,6 @@ def parse_args(phase="train"):
     If the phase is "render", arguments related to rendering, such as the configuration file, asset paths, npy motion files, render target, and joint type for the skeleton are added.
     """
     
-    
     if phase in ["train", "test", "demo"]:
         group.add_argument(
             "--cfg",
