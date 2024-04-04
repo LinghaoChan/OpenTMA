@@ -5,8 +5,19 @@ from mld.models.operator import AdaptiveInstanceNorm1d
 
 
 class MLP(nn.Module):
-
+    """
+    This class is a subclass of nn.Module. 
+    It implements a Multilayer Perceptron (MLP) with configurable dimensions and activation functions.
+    """
     def __init__(self, cfg, out_dim, is_init):
+        """
+        Inputs:
+            cfg (dict): The configuration dictionary.
+            out_dim (int): The dimension of the output.
+            is_init (bool): Whether to initialize the weights.
+
+        This function is the constructor of the MLP class. It initializes the MLP with the given configuration and output dimension. If is_init is True, it also initializes the weights.
+        """
         super(MLP, self).__init__()
         dims = cfg.MODEL.MOTION_DECODER.MLP_DIM
         n_blk = len(dims)
@@ -22,21 +33,48 @@ class MLP(nn.Module):
         if is_init:
             for m in self.modules():
                 if isinstance(m, nn.Linear):
-                    #nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
                     nn.init.constant_(m.weight, 1)
                 elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
                     nn.init.constant_(m.weight, 1)
                     nn.init.constant_(m.bias, 0)
 
     def forward(self, x):
+        """
+        Inputs:
+            x (Tensor): The input tensor.
+
+        This function applies the MLP to the input tensor and returns the output tensor.
+
+        Returns:
+            Tensor: The output tensor.
+        """
         return self.model(x.view(x.size(0), -1))
 
 
 def ZeroPad1d(sizes):
+    """
+    Inputs:
+        sizes (tuple): The padding sizes.
+
+    This function returns a 1D zero padding layer with the given sizes.
+
+    Returns:
+        nn.ConstantPad1d: The 1D zero padding layer.
+    """
     return nn.ConstantPad1d(sizes, 0)
 
 
 def get_acti_layer(acti='relu', inplace=True):
+    """
+    Inputs:
+        acti (str): The activation function. Default is 'relu'.
+        inplace (bool): Whether to apply the activation function in-place. Default is True.
+
+    This function returns a list containing the activation layer.
+
+    Returns:
+        list: A list containing the activation layer.
+    """
 
     if acti == 'relu':
         return [nn.ReLU(inplace=inplace)]
@@ -51,11 +89,20 @@ def get_acti_layer(acti='relu', inplace=True):
 
 
 def get_norm_layer(norm='none', norm_dim=None):
+    """
+    Inputs:
+        norm (str): The normalization function. Default is 'none'.
+        norm_dim (int): The dimension of the normalization.
+
+    This function returns a list containing the normalization layer.
+
+    Returns:
+        list: A list containing the normalization layer.
+    """
 
     if norm == 'bn':
         return [nn.BatchNorm1d(norm_dim)]
     elif norm == 'in':
-        # return [nn.InstanceNorm1d(norm_dim, affine=False)]  # for rt42!
         return [nn.InstanceNorm1d(norm_dim, affine=True)]
     elif norm == 'adain':
         return [AdaptiveInstanceNorm1d(norm_dim)]
@@ -66,6 +113,16 @@ def get_norm_layer(norm='none', norm_dim=None):
 
 
 def get_dropout_layer(dropout=None):
+    """
+    Inputs:
+        dropout (float): The dropout rate.
+
+    This function returns a list containing the dropout layer.
+
+    Returns:
+        list: A list containing the dropout layer.
+    """
+    
     if dropout is not None:
         return [nn.Dropout(p=dropout)]
     else:
@@ -79,7 +136,18 @@ def ConvLayers(kernel_size,
                pad_type='reflect',
                use_bias=True):
     """
-    returns a list of [pad, conv] => should be += to some list, then apply sequential
+    Inputs:
+        kernel_size (int): The size of the kernel.
+        in_channels (int): The number of input channels.
+        out_channels (int): The number of output channels.
+        stride (int): The stride of the convolution. Default is 1.
+        pad_type (str): The type of padding. Default is 'reflect'.
+        use_bias (bool): Whether to use bias. Default is True.
+
+    This function returns a list containing the padding and convolution layers.
+
+    Returns:
+        list: A list containing the padding and convolution layers.
     """
 
     if pad_type == 'reflect':
@@ -115,7 +183,23 @@ def ConvBlock(kernel_size,
               use_bias=True,
               inplace=True):
     """
-    returns a list of [pad, conv, norm, acti] or [acti, pad, conv, norm]
+    Inputs:
+        kernel_size (int): The size of the kernel.
+        in_channels (int): The number of input channels.
+        out_channels (int): The number of output channels.
+        stride (int): The stride of the convolution. Default is 1.
+        pad_type (str): The type of padding. Default is 'reflect'.
+        dropout (float): The dropout rate.
+        norm (str): The normalization function. Default is 'none'.
+        acti (str): The activation function. Default is 'lrelu'.
+        acti_first (bool): Whether to apply the activation function first. Default is False.
+        use_bias (bool): Whether to use bias. Default is True.
+        inplace (bool): Whether to apply the activation function in-place. Default is True.
+
+    This function returns a list containing the convolution block layers.
+
+    Returns:
+        list: A list containing the convolution block layers.
     """
 
     layers = ConvLayers(kernel_size,
@@ -135,7 +219,20 @@ def ConvBlock(kernel_size,
 
 
 def LinearBlock(in_dim, out_dim, dropout=None, norm='none', acti='relu'):
+    """
+    Inputs:
+        in_dim (int): The dimension of the input.
+        out_dim (int): The dimension of the output.
+        dropout (float): The dropout rate.
+        norm (str): The normalization function. Default is 'none'.
+        acti (str): The activation function. Default is 'relu'.
 
+    This function returns a list containing the linear block layers.
+
+    Returns:
+        list: A list containing the linear block layers.
+    """
+     
     use_bias = True
     layers = []
     layers.append(nn.Linear(in_dim, out_dim, bias=use_bias))
