@@ -29,7 +29,6 @@ class MotionDiscriminator(nn.Module):
                                                   num_frames)
         motion_sequence = motion_sequence.permute(2, 0, 1)
         if hidden_unit is None:
-            # motion_sequence = motion_sequence.permute(1, 0, 2)
             hidden_unit = self.initHidden(motion_sequence.size(1),
                                           self.hidden_layer).to(
                                               motion_sequence.device)

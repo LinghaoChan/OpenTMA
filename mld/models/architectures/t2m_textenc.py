@@ -18,18 +18,12 @@ class TextEncoderBiGRUCo(nn.Module):
             nn.LeakyReLU(0.2, inplace=True),
             nn.Linear(hidden_size, output_size),
         )
-
-        # self.input_emb.apply(init_weight)
-        # self.pos_emb.apply(init_weight)
-        # self.output_net.apply(init_weight)
-        # self.linear2.apply(init_weight)
-        # self.batch_size = batch_size
+        
         self.hidden_size = hidden_size
         self.hidden = nn.Parameter(
             torch.randn((2, 1, self.hidden_size), requires_grad=True)
         )
 
-    # input(batch_size, seq_len, dim)
     def forward(self, word_embs, pos_onehot, cap_lens):
         num_samples = word_embs.shape[0]
 
@@ -63,14 +57,9 @@ class TextEncoderBiGRUCoV2(nn.Module):
             nn.Linear(hidden_size, output_size)
         )
 
-        # self.input_emb.apply(init_weight)
-        # self.output_net.apply(init_weight)
-        # self.linear2.apply(init_weight)
-        # self.batch_size = batch_size
         self.hidden_size = hidden_size
         self.hidden = nn.Parameter(torch.randn((2, 1, self.hidden_size), requires_grad=True))
 
-    # input(batch_size, seq_len, dim)
     def forward(self, word_embs, cap_lens):
         num_samples = word_embs.shape[0]
 

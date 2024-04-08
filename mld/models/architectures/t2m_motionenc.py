@@ -15,13 +15,10 @@ class MovementConvEncoder(nn.Module):
             nn.LeakyReLU(0.2, inplace=True),
         )
         self.out_net = nn.Linear(output_size, output_size)
-        # self.main.apply(init_weight)
-        # self.out_net.apply(init_weight)
 
     def forward(self, inputs):
         inputs = inputs.permute(0, 2, 1)
         outputs = self.main(inputs).permute(0, 2, 1)
-        # print(outputs.shape)
         return self.out_net(outputs)
 
 
@@ -39,9 +36,6 @@ class MotionEncoderBiGRUCo(nn.Module):
             nn.LeakyReLU(0.2, inplace=True),
             nn.Linear(hidden_size, output_size),
         )
-
-        # self.input_emb.apply(init_weight)
-        # self.output_net.apply(init_weight)
         self.hidden_size = hidden_size
         self.hidden = nn.Parameter(
             torch.randn((2, 1, self.hidden_size), requires_grad=True)

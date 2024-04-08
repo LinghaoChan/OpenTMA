@@ -77,32 +77,6 @@ class VPosert(nn.Module):
 
         return prec
 
-    # def forward(self, pose_body):
-    #     '''
-    #     :param Pin: aa: Nx1xnum_jointsx3 / matrot: Nx1xnum_jointsx9
-    #     :param input_type: matrot / aa for matrix rotations or axis angles
-    #     :param output_type: matrot / aa
-    #     :return:
-    #     '''
-
-    #     q_z = self.encode(pose_body)
-    #     q_z_sample = q_z.rsample()
-    #     decode_results = self.decode(q_z_sample)
-    #     decode_results.update({'poZ_body_mean': q_z.mean, 'poZ_body_std': q_z.scale, 'q_z': q_z})
-    #     return decode_results
-
-    # def sample_poses(self, num_poses, seed=None):
-    #     np.random.seed(seed)
-
-    #     some_weight = [a for a in self.parameters()][0]
-    #     dtype = some_weight.dtype
-    #     device = some_weight.device
-    #     self.eval()
-    #     with torch.no_grad():
-    #         Zgen = torch.tensor(np.random.normal(0., 1., size=(num_poses, self.latentD)), dtype=dtype, device=device)
-
-    #     return self.decode(Zgen)
-
 
 class BatchFlatten(nn.Module):
 
@@ -121,14 +95,6 @@ class ContinousRotReprDecoder(nn.Module):
 
     def forward(self, module_input):
         reshaped_input = module_input.view(-1, 196, 263)
-
-        # b1 = F.normalize(reshaped_input[:, :, 0], dim=1)
-
-        # dot_prod = torch.sum(b1 * reshaped_input[:, :, 1], dim=1, keepdim=True)
-        # b2 = F.normalize(reshaped_input[:, :, 1] - dot_prod * b1, dim=-1)
-        # b3 = torch.cross(b1, b2, dim=1)
-
-        # return torch.stack([b1, b2, b3], dim=-1)
         return reshaped_input
 
 
