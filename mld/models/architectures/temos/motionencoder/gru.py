@@ -12,15 +12,43 @@ from mld.utils.temos_utils import lengths_to_mask
 
 
 class GRUEncoder(pl.LightningModule):
+    """
+    This class is a GRU encoder for encoding input features.
+
+    Attributes:
+    - skel_embedding: a linear layer for embedding the input features.
+    - gru: a GRU layer for encoding the embedded features.
+    - mu: a linear layer for generating the mean of the latent distribution (only if VAE is used).
+    - logvar: a linear layer for generating the log variance of the latent distribution (only if VAE is used).
+    - final: a linear layer for generating the final output (only if VAE is not used).
+
+    Methods:
+    - __init__: initializes the GRUEncoder object with the given parameters.
+    - forward: encodes the input features and returns the encoded output.
+    """
+
     def __init__(self, nfeats: int, vae: bool,
                  latent_dim: int = 256,
-                 num_layers: int = 4, **kwargs) -> None:
+                 num_layers: int = 4, **kwargs):
+        """
+        Initializes the GRUEncoder object with the given parameters.
+
+        Inputs:
+        - nfeats: the number of input features.
+        - vae: a flag indicating whether to use a Variational Autoencoder (VAE).
+        - latent_dim: the dimension of the latent space.
+        - num_layers: the number of layers in the GRU.
+
+        Outputs: None
+        """
         super().__init__()
         self.save_hyperparameters(logger=False)
-
         input_feats = nfeats
+        
+        # Embed the input features
         self.skel_embedding = nn.Linear(input_feats, latent_dim)
 
+        # Initialize the GRU layer
         self.gru = nn.GRU(latent_dim, latent_dim, num_layers=num_layers)
 
         # Action agnostic: only one set of params
@@ -30,7 +58,16 @@ class GRUEncoder(pl.LightningModule):
         else:
             self.final = nn.Linear(latent_dim, latent_dim)
 
-    def forward(self, features: Tensor, lengths: Optional[List[int]] = None) -> Union[Tensor, Distribution]:
+    def forward(self, features: Tensor, lengths: Optional[List[int]] = None):
+        """
+        Encodes the input features and returns the encoded output.
+
+        Inputs:
+        - features: a tensor of input features.
+        - lengths: a list of lengths of the input features.
+
+        Outputs: the encoded output.
+        """
         if lengths is None:
             lengths = [len(feature) for feature in features]
 

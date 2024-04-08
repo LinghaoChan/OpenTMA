@@ -12,11 +12,41 @@ from mld.utils.temos_utils import lengths_to_mask
 
 
 class ActorAgnosticEncoder(pl.LightningModule):
+    """
+    This class is an actor-agnostic encoder for encoding input features.
+
+    Attributes:
+    - skel_embedding: a linear layer for embedding the input features.
+    - mu_token, logvar_token: parameters for generating the mean and log variance of the latent distribution (only if VAE is used).
+    - emb_token: parameter for generating the final output (only if VAE is not used).
+    - sequence_pos_encoding: a positional encoding layer for adding positional information to the input features.
+    - seqTransEncoder: a transformer encoder for encoding the input features.
+
+    Methods:
+    - __init__: initializes the ActorAgnosticEncoder object with the given parameters.
+    - forward: encodes the input features and returns the encoded output.
+    """
+
     def __init__(self, nfeats: int, vae: bool,
                  latent_dim: int = 256, ff_size: int = 1024,
                  num_layers: int = 4, num_heads: int = 4,
                  dropout: float = 0.1,
-                 activation: str = "gelu", **kwargs) -> None:
+                 activation: str = "gelu", **kwargs):
+        """
+        Initializes the ActorAgnosticEncoder object with the given parameters.
+
+        Inputs:
+        - nfeats: the number of input features.
+        - vae: a flag indicating whether to use a Variational Autoencoder (VAE).
+        - latent_dim: the dimension of the latent space.
+        - ff_size: the size of the feedforward network in the transformer.
+        - num_layers: the number of layers in the transformer.
+        - num_heads: the number of attention heads in the transformer.
+        - dropout: the dropout rate.
+        - activation: the activation function to use in the transformer.
+
+        Outputs: None
+        """
         super().__init__()
         self.save_hyperparameters(logger=False)
         input_feats = nfeats
@@ -29,18 +59,31 @@ class ActorAgnosticEncoder(pl.LightningModule):
         else:
             self.emb_token = nn.Parameter(torch.randn(latent_dim))
 
+        # Initialize the positional encoding layer
         self.sequence_pos_encoding = PositionalEncoding(latent_dim, dropout)
 
+        # Initialize the transformer encoder layer
         seq_trans_encoder_layer = nn.TransformerEncoderLayer(d_model=latent_dim,
                                                              nhead=num_heads,
                                                              dim_feedforward=ff_size,
                                                              dropout=dropout,
                                                              activation=activation)
 
+        # Initialize the transformer encoder
         self.seqTransEncoder = nn.TransformerEncoder(seq_trans_encoder_layer,
                                                      num_layers=num_layers)
 
-    def forward(self, features: Tensor, lengths: Optional[List[int]] = None) -> Union[Tensor, Distribution]:
+    def forward(self, features: Tensor, lengths: Optional[List[int]] = None):
+        """
+        Encodes the input features and returns the encoded output.
+
+        Inputs:
+        - features: a tensor of input features.
+        - lengths: a list of lengths of the input features.
+
+        Outputs: the encoded output.
+        """
+        
         if lengths is None:
             lengths = [len(feature) for feature in features]
 

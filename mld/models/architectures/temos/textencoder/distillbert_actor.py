@@ -17,12 +17,28 @@ class DistilbertActorAgnosticEncoder(DistilbertEncoderBase):
                  ff_size: int = 1024,
                  num_layers: int = 4, num_heads: int = 4,
                  dropout: float = 0.1,
-                 activation: str = "gelu", **kwargs) -> None:
+                 activation: str = "gelu", **kwargs):
+        """
+        Initializes the DistilbertActorAgnosticEncoder object with the given parameters.
+
+        Inputs:
+        - modelpath: the path to the pre-trained DistilBERT model.
+        - finetune: a flag indicating whether to fine-tune the DistilBERT model.
+        - vae: a flag indicating whether to use a VAE model.
+        - latent_dim: the dimension of the latent space.
+        - ff_size: the size of the feedforward network in the transformer encoder.
+        - num_layers: the number of layers in the transformer encoder.
+        - num_heads: the number of attention heads in the transformer encoder.
+        - dropout: the dropout rate.
+        - activation: the activation function to use in the transformer encoder.
+
+        Outputs: None
+        """
         super().__init__(modelpath=modelpath, finetune=finetune)
         self.save_hyperparameters(logger=False)
 
         encoded_dim = self.text_encoded_dim
-        # import pdb; pdb.set_trace()
+        
         # Projection of the text-outputs into the latent space
         self.projection = nn.Sequential(nn.ReLU(),
                                         nn.Linear(encoded_dim, latent_dim))
@@ -46,7 +62,7 @@ class DistilbertActorAgnosticEncoder(DistilbertEncoderBase):
         self.seqTransEncoder = nn.TransformerEncoder(seq_trans_encoder_layer,
                                                      num_layers=num_layers)
 
-    def forward(self, texts: List[str]) -> Union[Tensor, Distribution]:
+    def forward(self, texts: List[str]):
         text_encoded, mask = self.get_last_hidden_state(texts, return_mask=True)
 
         x = self.projection(text_encoded)
