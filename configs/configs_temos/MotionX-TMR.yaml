@@ -1,7 +1,7 @@
-NAME: MotionX-TMR # Experiment name
+NAME: MotionX-TMR-evanmotion # Experiment name
 DEBUG: False # Debug mode
 ACCELERATOR: 'gpu' # Devices optioncal: “cpu”, “gpu”, “tpu”, “ipu”, “hpu”, “mps, “auto”
-DEVICE: [0,1,2,3] # Index of gpus eg. [0] or [0,1,2,3]
+DEVICE: [0,1,2] # Index of gpus eg. [0] or [0,1,2,3]
 # DEVICE: [0] # Index of gpus eg. [0] or [0,1,2,3]
 
 # Training configuration
