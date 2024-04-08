@@ -11,6 +11,19 @@ from mld.utils.temos_utils import lengths_to_mask
 
 
 class ActorAgnosticDecoder(pl.LightningModule):
+    """
+    This class is a decoder module for actor-agnostic features. It uses a transformer-based architecture for decoding.
+
+    Args:
+        nfeats (int): The number of features in the input.
+        latent_dim (int, optional): The dimensionality of the latent space. Defaults to 256.
+        ff_size (int, optional): The dimensionality of the feedforward network model. Defaults to 1024.
+        num_layers (int, optional): The number of sub-encoder-layers in the transformer model. Defaults to 4.
+        num_heads (int, optional): The number of heads in the multiheadattention models. Defaults to 4.
+        dropout (float, optional): The dropout value. Defaults to 0.1.
+        activation (str, optional): The activation function of intermediate layer, relu or gelu. Defaults to "gelu".
+    """
+
     def __init__(self, nfeats: int,
                  latent_dim: int = 256, ff_size: int = 1024,
                  num_layers: int = 4, num_heads: int = 4,
@@ -24,6 +37,7 @@ class ActorAgnosticDecoder(pl.LightningModule):
 
         self.sequence_pos_encoding = PositionalEncoding(latent_dim, dropout)
 
+        # Transformer decoder
         seq_trans_decoder_layer = nn.TransformerDecoderLayer(d_model=latent_dim,
                                                              nhead=num_heads,
                                                              dim_feedforward=ff_size,
@@ -33,9 +47,22 @@ class ActorAgnosticDecoder(pl.LightningModule):
         self.seqTransDecoder = nn.TransformerDecoder(seq_trans_decoder_layer,
                                                      num_layers=num_layers)
 
+        # Final linear layer
         self.final_layer = nn.Linear(latent_dim, output_feats)
 
     def forward(self, z: Tensor, lengths: List[int]):
+        """
+        Forward pass for the decoder.
+
+        Args:
+            z (Tensor): The input tensor.
+            lengths (List[int]): The lengths of the sequences.
+
+        Returns:
+            Tensor: The output features.
+        """
+
+        # Create a mask based on the lengths
         mask = lengths_to_mask(lengths, z.device)
         latent_dim = z.shape[1]
         bs, nframes = mask.shape
