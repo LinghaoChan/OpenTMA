@@ -623,7 +623,7 @@ class TEMOS(BaseModel):
         
         # If the configuration specifies to synchronize the embeddings,
         # calculate the TMR embeddings.
-       if sync: 
+        if sync: 
             TMR_motion_embedding = self.t2m_TMR_motionencoder(feat_from_text, batch["length"]).loc
             TMR_text_embedding = self.t2m_TMR_textencoder(batch["text"]).loc
         
