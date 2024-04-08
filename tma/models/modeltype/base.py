@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from pytorch_lightning import LightningModule
-from mld.models.metrics import ComputeMetrics, MRMetrics, TM2TMetrics, MMMetrics, UncondMetrics
+from tma.models.metrics import ComputeMetrics, MRMetrics, TM2TMetrics, MMMetrics, UncondMetrics
 from os.path import join as pjoin
 from collections import OrderedDict
 

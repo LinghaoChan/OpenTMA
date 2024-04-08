@@ -6,8 +6,8 @@ import pytorch_lightning as pl
 from typing import List, Optional
 from torch import nn, Tensor
 
-from mld.models.operator import PositionalEncoding
-from mld.utils.temos_utils import lengths_to_mask
+from tma.models.operator import PositionalEncoding
+from tma.utils.temos_utils import lengths_to_mask
 
 
 class ActorAgnosticDecoder(pl.LightningModule):

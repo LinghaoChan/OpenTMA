@@ -4,7 +4,7 @@ from dataclasses import dataclass, fields
 class Transform:
 
     def collate(self, lst_datastruct):
-        from mld.datasets.utils import collate_tensor_with_padding
+        from tma.datasets.utils import collate_tensor_with_padding
         example = lst_datastruct[0]
 
         def collate_or_none(key):

@@ -1,6 +1,6 @@
 motionencoder:
   name: actor_encoder
-  target: mld.models.architectures.temos.motionencoder.actor.ActorAgnosticEncoder
+  target: tma.models.architectures.temos.motionencoder.actor.ActorAgnosticEncoder
   params:
     latent_dim: ${model.latent_dim}
     vae: ${model.vae}

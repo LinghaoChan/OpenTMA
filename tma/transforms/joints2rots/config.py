@@ -1,5 +1,5 @@
 import numpy as np
-from mld.utils.joints import mmm_joints, smplh2mmm_indexes
+from tma.utils.joints import mmm_joints, smplh2mmm_indexes
 
 # Map joints Name to SMPL joints idx
 JOINT_MAP = {

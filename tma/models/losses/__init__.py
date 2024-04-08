@@ -1,2 +1,2 @@
-from mld.models.losses.temos import TemosLosses
-from mld.models.losses.tmost import TmostLosses
+from tma.models.losses.temos import TemosLosses
+from tma.models.losses.tmost import TmostLosses

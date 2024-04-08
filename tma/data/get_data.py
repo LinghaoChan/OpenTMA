@@ -135,16 +135,12 @@ def get_WordVectorizer(cfg, phase, dataset_name):
 def get_collate_fn(name, cfg, phase="train"):
     if name.lower() in ["humanml3d", "kit", "motionx", "unimocap"]:
         if cfg.model.condition in ['text_all', 'text_face', 'text_body', 'text_hand', 'text_face_body', 'text_seperate', 'only_pose_concat', 'only_pose_fusion']:
-            return mld_collate_text_all
+            return tma_collate_text_all
         else:
-            return mld_collate
+            return tma_collate
     elif name.lower() in ["humanact12", 'uestc']:
         return a2m_collate
-    # else:
-    #     return all_collate
-    # if phase == "test":
-    #     return eval_collate
-    # else:
+
 
 
 # map config name to module&path

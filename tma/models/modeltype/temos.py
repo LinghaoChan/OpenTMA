@@ -3,19 +3,19 @@ from typing import List, Optional
 import torch
 from torch import Tensor
 from omegaconf import DictConfig
-from mld.models.tools.tools import remove_padding
+from tma.models.tools.tools import remove_padding
 
-from mld.models.metrics import ComputeMetrics
+from tma.models.metrics import ComputeMetrics
 from torchmetrics import MetricCollection
-from mld.models.modeltype.base import BaseModel
+from tma.models.modeltype.base import BaseModel
 from torch.distributions.distribution import Distribution
-from mld.config import instantiate_from_config
+from tma.config import instantiate_from_config
 
-from mld.models.losses.temos import TemosLosses
+from tma.models.losses.temos import TemosLosses
 from torch.optim import AdamW
 from sentence_transformers import SentenceTransformer
 
-from mld.models.architectures import t2m_textenc, t2m_motionenc
+from tma.models.architectures import t2m_textenc, t2m_motionenc
 import os
 
 import time
@@ -24,8 +24,8 @@ import numpy as np
 import torch.nn.functional as f
 from pathlib import Path
 
-from mld.models.architectures.temos.textencoder.distillbert_actor import DistilbertActorAgnosticEncoder
-from mld.models.architectures.temos.motionencoder.actor import ActorAgnosticEncoder
+from tma.models.architectures.temos.textencoder.distillbert_actor import DistilbertActorAgnosticEncoder
+from tma.models.architectures.temos.motionencoder.actor import ActorAgnosticEncoder
 from collections import OrderedDict
 from transformers import AutoTokenizer, AutoModel
 

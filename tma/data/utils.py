@@ -54,7 +54,7 @@ def all_collate(batch):
 
 
 # an adapter to our collate func
-def mld_collate(batch):
+def tma_collate(batch):
     notnone_batches = [b for b in batch if b is not None]
     notnone_batches.sort(key=lambda x: x[3], reverse=True)
     # batch.sort(key=lambda x: x[3], reverse=True)
@@ -74,7 +74,7 @@ def mld_collate(batch):
     }
     return adapted_batch
 
-def mld_collate_text_all(batch):
+def tma_collate_text_all(batch):
     # import pdb; pdb.set_trace()
     notnone_batches = [b for b in batch if b is not None]
     notnone_batches.sort(key=lambda x: x[3], reverse=True)

@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 
-from mld.utils.joints import mmm_joints, humanml3d_joints, motionx_joints
+from tma.utils.joints import mmm_joints, humanml3d_joints, motionx_joints
 
 # Get the indexes of particular body part
 

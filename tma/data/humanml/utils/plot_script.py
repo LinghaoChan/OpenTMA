@@ -10,7 +10,7 @@ from matplotlib.animation import FFMpegFileWriter, FuncAnimation
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
-import mld.data.humanml.utils.paramUtil as paramUtil
+import tma.data.humanml.utils.paramUtil as paramUtil
 
 skeleton = paramUtil.t2m_kinematic_chain
 

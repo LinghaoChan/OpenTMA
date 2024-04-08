@@ -7,7 +7,7 @@ from torchmetrics.functional import pairwise_euclidean_distance
 import os
 from .utils import *
 
-from mld.models.architectures import humanact12_gru
+from tma.models.architectures import humanact12_gru
 
 
 class HUMANACTMetrics(Metric):

@@ -423,7 +423,7 @@ def rot6d_to_rotmat(x):
     return rot_mats
 
 
-import mld.utils.rotation_conversions as rotation_conversions
+import tma.utils.rotation_conversions as rotation_conversions
 
 
 def rot6d(x_rotations, pose_rep):

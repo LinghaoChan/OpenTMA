@@ -6,11 +6,11 @@ import torch
 from omegaconf import OmegaConf
 from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.callbacks import ModelCheckpoint
-from mld.callback import ProgressLogger
-from mld.config import parse_args
-from mld.data.get_data import get_datasets
-from mld.models.get_model import get_model
-from mld.utils.logger import create_logger
+from tma.callback import ProgressLogger
+from tma.config import parse_args
+from tma.data.get_data import get_datasets
+from tma.models.get_model import get_model
+from tma.utils.logger import create_logger
 
 
 def main():
@@ -176,23 +176,6 @@ def main():
                 name = k.replace("vae.", "")
                 vae_dict[name] = v
         model.vae.load_state_dict(vae_dict, strict=True)
-
-    if cfg.TRAIN.PRETRAINED_MLD:
-        logger.info("Loading pretrain mld from {}".format(
-            cfg.TRAIN.PRETRAINED_MLD))
-
-        state_dict = torch.load(cfg.TRAIN.PRETRAINED_MLD,
-                                map_location="cpu")["state_dict"]
-                    
-        
-        from collections import OrderedDict
-        vae_dict = OrderedDict()
-        for k, v in state_dict.items():
-            if k.split(".")[0] == "denoiser":
-                name = k.replace("denoiser.", "")
-                vae_dict[name] = v
-        model.denoiser.load_state_dict(vae_dict, strict=True)
-
 
 
     # Load pre-trained models if specified

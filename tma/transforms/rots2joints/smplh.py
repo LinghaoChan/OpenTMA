@@ -73,7 +73,7 @@ class SMPLH(Rots2Joints):
             raise NotImplementedError("Could not parse the poses.")
 
         # Convert any rotations to matrix
-        # from mld.tools.easyconvert import to_matrix
+        # from tma.tools.easyconvert import to_matrix
         # matrix_poses = to_matrix(input_pose_rep, poses)
         matrix_poses = poses
 
@@ -90,7 +90,7 @@ class SMPLH(Rots2Joints):
 
         body_pose = matrix_poses[:, 1:22]
         if nohands:
-            from mld.tools.easyconvert import to_matrix
+            from tma.tools.easyconvert import to_matrix
             # still axis angle
             left_hand_pose = self.smplh.left_hand_mean.reshape(15, 3)
             left_hand_pose = to_matrix("axisangle", left_hand_pose)
@@ -134,16 +134,16 @@ class SMPLH(Rots2Joints):
 
 
 def smplh_to(jointstype, data, trans):
-    from mld.utils.joints import get_root_idx
+    from tma.utils.joints import get_root_idx
 
     if "mmm" in jointstype:
-        from mld.utils.joints import smplh2mmm_indexes
+        from tma.utils.joints import smplh2mmm_indexes
         indexes = smplh2mmm_indexes
         data = data[..., indexes, :]
 
         # make it compatible with mmm
         if jointstype == "mmm":
-            from mld.utils.joints import smplh_to_mmm_scaling_factor
+            from tma.utils.joints import smplh_to_mmm_scaling_factor
             data *= smplh_to_mmm_scaling_factor
 
         if jointstype == "smplmmm":
@@ -155,7 +155,7 @@ def smplh_to(jointstype, data, trans):
             data[..., 2] = -data[..., 2]
 
     elif jointstype == "smplnh":
-        from mld.utils.joints import smplh2smplnh_indexes
+        from tma.utils.joints import smplh2smplnh_indexes
         indexes = smplh2smplnh_indexes
         data = data[..., indexes, :]
     elif jointstype == "smplh":

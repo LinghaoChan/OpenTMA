@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from mld.models.operator import AdaptiveInstanceNorm1d
+from tma.models.operator import AdaptiveInstanceNorm1d
 
 
 class MLP(nn.Module):

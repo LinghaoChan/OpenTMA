@@ -18,9 +18,9 @@ from functools import partial
 from itertools import repeat
 # from torch._six import container_abcs
 
-from mld.utils.maed_utils import DropPath, determine_output_feature_dim, load_state_dict
-from mld.models.architectures.hrnet import get_hrnet
-from mld.models.architectures.resnetv2 import ResNetV2
+from tma.utils.maed_utils import DropPath, determine_output_feature_dim, load_state_dict
+from tma.models.architectures.hrnet import get_hrnet
+from tma.models.architectures.resnetv2 import ResNetV2
 from .ghost_nas_network import get_ghostnas
 from .ghost_nas_network_tiny import get_ghostnas as get_ghostnas_tiny
 # from torchvision.models.utils import load_state_dict_from_url

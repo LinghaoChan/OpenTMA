@@ -1,4 +1,4 @@
-import mld.utils.geometry as geometry
+import tma.utils.geometry as geometry
 
 
 # This function returns the number of features for a given rotation type.

@@ -7,7 +7,7 @@ from torchmetrics.functional import pairwise_euclidean_distance
 import os
 from .utils import *
 
-from mld.models.architectures import uestc_stgcn
+from tma.models.architectures import uestc_stgcn
 
 
 class UESTCMetrics(Metric):

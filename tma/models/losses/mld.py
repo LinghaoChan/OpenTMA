@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from torchmetrics import Metric
 
-from mld.data.humanml.scripts.motion_process import (qrot,
+from tma.data.humanml.scripts.motion_process import (qrot,
                                                      recover_root_rot_pos)
 
 

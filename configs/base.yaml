@@ -18,8 +18,8 @@ TRAIN:
   ABLATION:
     VAE_TYPE: 'actor' # vae ablation: actor or mcross
     VAE_ARCH: 'encoder_decoder' # mdiffusion vae architecture
-    PE_TYPE: 'actor' # mdiffusion mld or actor
-    DIFF_PE_TYPE: 'actor' # mdiffusion mld or actor
+    PE_TYPE: 'actor' # mdiffusion tma or actor
+    DIFF_PE_TYPE: 'actor' # mdiffusion tma or actor
     SKIP_CONNECT: False # skip connection for denoiser va
     # use linear to expand mean and std rather expand token nums
     MLP_DIST: False

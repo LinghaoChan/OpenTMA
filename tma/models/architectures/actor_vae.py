@@ -4,8 +4,8 @@ import torch
 import torch.nn as nn
 from torch import Tensor, nn
 from torch.distributions.distribution import Distribution
-from mld.utils.temos_utils import lengths_to_mask
-from mld.models.operator import PositionalEncoding
+from tma.utils.temos_utils import lengths_to_mask
+from tma.models.operator import PositionalEncoding
 
 
 class ActorVae(nn.Module):

@@ -4,8 +4,8 @@ import torch
 from torch import Tensor
 from einops import rearrange
 
-from mld.utils.temos_utils import matrix_to, nfeats_of, to_matrix
-import mld.utils.geometry as geometry
+from tma.utils.temos_utils import matrix_to, nfeats_of, to_matrix
+import tma.utils.geometry as geometry
 
 from .base import Rots2Rfeats
 

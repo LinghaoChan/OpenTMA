@@ -7,8 +7,8 @@ from typing import List, Optional, Union
 from torch import nn, Tensor
 from torch.distributions.distribution import Distribution
 
-from mld.models.operator import PositionalEncoding
-from mld.utils.temos_utils import lengths_to_mask
+from tma.models.operator import PositionalEncoding
+from tma.utils.temos_utils import lengths_to_mask
 
 
 class ActorAgnosticEncoder(pl.LightningModule):

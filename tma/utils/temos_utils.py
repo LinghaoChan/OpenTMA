@@ -2,7 +2,7 @@ from typing import Dict, List
 import numpy as np
 import torch
 from torch import Tensor
-import mld.utils.geometry as geometry
+import tma.utils.geometry as geometry
 
 
 def lengths_to_mask(lengths: List[int],

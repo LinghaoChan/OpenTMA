@@ -5,9 +5,9 @@ from einops import rearrange
 from torch import Tensor
 from torchmetrics import Metric
 
-from mld.models.tools.tools import remove_padding
-from mld.transforms.joints2jfeats import Rifke
-from mld.utils.geometry import matrix_of_angles
+from tma.models.tools.tools import remove_padding
+from tma.transforms.joints2jfeats import Rifke
+from tma.utils.geometry import matrix_of_angles
 
 from .utils import l2_norm, variance
 

@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from mld.data.humanml.scripts.motion_process import recover_from_ric
+from tma.data.humanml.scripts.motion_process import recover_from_ric
 
 from .base import BASEDataModule
 from .humanml.data.dataset import Text2MotionDatasetV2, TextOnlyDataset

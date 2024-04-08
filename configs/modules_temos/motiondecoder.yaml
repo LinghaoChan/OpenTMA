@@ -1,6 +1,6 @@
 motiondecoder:
   name: actor_decoder
-  target: mld.models.architectures.temos.motiondecoder.actor.ActorAgnosticDecoder
+  target: tma.models.architectures.temos.motiondecoder.actor.ActorAgnosticDecoder
   params:
     latent_dim: ${model.latent_dim}
     ff_size: ${model.ff_size}

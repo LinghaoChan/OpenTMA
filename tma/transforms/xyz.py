@@ -2,7 +2,7 @@ from typing import Optional
 from torch import Tensor
 
 from .base import Datastruct, dataclass, Transform
-from mld.datasets.utils import collate_tensor_with_padding
+from tma.datasets.utils import collate_tensor_with_padding
 
 from .joints2jfeats import Joints2Jfeats
 

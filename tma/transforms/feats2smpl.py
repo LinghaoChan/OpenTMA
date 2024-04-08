@@ -3,10 +3,10 @@ from os.path import join as pjoin
 import numpy as np
 import torch
 
-import mld.data.humanml.utils.paramUtil as paramUtil
-from mld.data.humanml.data.dataset import Text2MotionDatasetV2
-from mld.data.humanml.scripts.motion_process import recover_from_ric
-from mld.data.humanml.utils.plot_script import plot_3d_motion
+import tma.data.humanml.utils.paramUtil as paramUtil
+from tma.data.humanml.data.dataset import Text2MotionDatasetV2
+from tma.data.humanml.scripts.motion_process import recover_from_ric
+from tma.data.humanml.utils.plot_script import plot_3d_motion
 
 # Define the skeleton structure using the kinematic chain from paramUtil
 skeleton = paramUtil.t2m_kinematic_chain
