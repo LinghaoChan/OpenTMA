@@ -291,6 +291,7 @@ def get_datasets(cfg, logger=None, phase="train"):
 
         else:
             raise NotImplementedError
+    # import pdb; pdb.set_trace()
     cfg.DATASET.NFEATS = datasets[0].nfeats
     cfg.DATASET.NJOINTS = datasets[0].njoints
     return datasets

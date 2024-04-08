@@ -44,6 +44,7 @@ class Motion_XDataModule(BASEDataModule):
             "progress_bar": False
         }
         self._sample_set = self.get_sample_set(overrides=sample_overrides)
+        # import pdb; pdb.set_trace()
         # Get additional info of the dataset
         self.nfeats = self._sample_set.nfeats
         # self.transforms = self._sample_set.transforms
