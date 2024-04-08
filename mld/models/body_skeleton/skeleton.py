@@ -59,7 +59,6 @@ class Skeleton(object):
         across2 = joints[:, sdr_r] - joints[:, sdr_l]
         across = across1 + across2
         across = across / np.sqrt((across**2).sum(axis=-1))[:, np.newaxis]
-        # print(across1.shape, across2.shape)
 
         # forward (batch_size, 3)
         forward = np.cross(np.array([[0, 1, 0]]), across, axis=-1)
@@ -74,22 +73,20 @@ class Skeleton(object):
 
         '''Inverse Kinematics'''
         # quat_params (batch_size, joints_num, 4)
-        # print(joints.shape[:-1])
         quat_params = np.zeros(joints.shape[:-1] + (4,))
-        # print(quat_params.shape)
+        
         root_quat[0] = np.array([[1.0, 0.0, 0.0, 0.0]])
         quat_params[:, 0] = root_quat
-        # quat_params[0, 0] = np.array([[1.0, 0.0, 0.0, 0.0]])
         for chain in self._kinematic_tree:
             R = root_quat
             for j in range(len(chain) - 1):
                 # (batch, 3)
                 u = self._raw_offset_np[chain[j+1]][np.newaxis,...].repeat(len(joints), axis=0)
-                # print(u.shape)
+
                 # (batch, 3)
                 v = joints[:, chain[j+1]] - joints[:, chain[j]]
                 v = v / np.sqrt((v**2).sum(axis=-1))[:, np.newaxis]
-                # print(u.shape, v.shape)
+
                 rot_u_v = qbetween_np(u, v)
 
                 R_loc = qmul_np(qinv_np(R), rot_u_v)
@@ -173,9 +170,7 @@ class Skeleton(object):
         # cont6d_params (batch_size, joints_num, 6)
         # joints (batch_size, joints_num, 3)
         # root_pos (batch_size, 3)
-        # import pdb; pdb.set_trace()
         if skel_joints is not None:
-            # skel_joints = torch.from_numpy(skel_joints)
             offsets = self.get_offsets_joints_batch(skel_joints)
         if len(self._offset.shape) == 2:
             offsets = self._offset.expand(cont6d_params.shape[0], -1, -1)
@@ -189,7 +184,6 @@ class Skeleton(object):
             for i in range(1, len(chain)):
                 matR = torch.matmul(matR, cont6d_to_matrix(cont6d_params[:, chain[i]]))
                 offset_vec = offsets[:, chain[i]].unsqueeze(-1).to(matR.device)
-                # print(matR.shape, offset_vec.shape)
                 joints[:, chain[i]] = torch.matmul(matR, offset_vec).squeeze(-1) + joints[:, chain[i-1]]
         return joints
 
