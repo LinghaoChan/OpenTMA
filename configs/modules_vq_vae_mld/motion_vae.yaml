@@ -1,7 +1,0 @@
-motion_vae:
-  # Optional: mld_vae, vposert_vae
-  target: mld.models.architectures.vq_vae.vq_vae.HumanVQVAE
-  params:
-    mu: 0.99
-    nfeats: ${DATASET.NFEATS}
-    ablation: ${TRAIN.ABLATION}

@@ -15,7 +15,6 @@ TRAIN:
   START_EPOCH: 0 # Start epochMMOTIONENCODER
   END_EPOCH: 1000 # End epoch
   RESUME: '' # Resume training from this path
-  PRETRAINED_VAE: ''
   OPTIM:
     TYPE: AdamW # Optimizer type
     LR: 1e-4 # Learning rate
