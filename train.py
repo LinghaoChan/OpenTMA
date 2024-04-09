@@ -90,27 +90,27 @@ def main():
     
     # Define metrics to monitor
     metric_monitor = {
-        "Train_jf": "recons/text2jfeats/train",
-        "Val_jf": "recons/text2jfeats/val",
-        "Train_rf": "recons/text2rfeats/train",
-        "Val_rf": "recons/text2rfeats/val",
-        "APE root": "Metrics/APE_root",
-        "APE mean pose": "Metrics/APE_mean_pose",
-        "AVE root": "Metrics/AVE_root",
-        "AVE mean pose": "Metrics/AVE_mean_pose",
-        "R_TOP_1": "Metrics/R_precision_top_1",
-        "R_TOP_2": "Metrics/R_precision_top_2",
-        "R_TOP_3": "Metrics/R_precision_top_3",
-        "gt_R_TOP_1": "Metrics/gt_R_precision_top_1",
-        "gt_R_TOP_2": "Metrics/gt_R_precision_top_2",
-        "gt_R_TOP_3": "Metrics/gt_R_precision_top_3",
-        "FID": "Metrics/FID",
-        "gt_FID": "Metrics/gt_FID",
-        "Diversity": "Metrics/Diversity",
-        "gt_Diversity": "Metrics/gt_Diversity",
-        "MM dist": "Metrics/Matching_score",
-        "Accuracy": "Metrics/accuracy",
-        "gt_Accuracy": "Metrics/gt_accuracy",
+        # "Train_jf": "recons/text2jfeats/train",
+        # "Val_jf": "recons/text2jfeats/val",
+        # "Train_rf": "recons/text2rfeats/train",
+        # "Val_rf": "recons/text2rfeats/val",
+        # "APE root": "Metrics/APE_root",
+        # "APE mean pose": "Metrics/APE_mean_pose",
+        # "AVE root": "Metrics/AVE_root",
+        # "AVE mean pose": "Metrics/AVE_mean_pose",
+        # "R_TOP_1": "Metrics/R_precision_top_1",
+        # "R_TOP_2": "Metrics/R_precision_top_2",
+        # "R_TOP_3": "Metrics/R_precision_top_3",
+        # "gt_R_TOP_1": "Metrics/gt_R_precision_top_1",
+        # "gt_R_TOP_2": "Metrics/gt_R_precision_top_2",
+        # "gt_R_TOP_3": "Metrics/gt_R_precision_top_3",
+        # "FID": "Metrics/FID",
+        # "gt_FID": "Metrics/gt_FID",
+        # "Diversity": "Metrics/Diversity",
+        # "gt_Diversity": "Metrics/gt_Diversity",
+        # "MM dist": "Metrics/Matching_score",
+        # "Accuracy": "Metrics/accuracy",
+        # "gt_Accuracy": "Metrics/gt_accuracy",
     }
 
     # Define callbacks for training
@@ -159,41 +159,6 @@ def main():
     else:
         vae_type = cfg.model.motion_vae.target.split(".")[-1].lower().replace(
             "vae", "")
-
-
-
-    # strict load vae model
-    if cfg.TRAIN.PRETRAINED_VAE:
-        logger.info("Loading pretrain vae from {}".format(
-            cfg.TRAIN.PRETRAINED_VAE))
-        state_dict = torch.load(cfg.TRAIN.PRETRAINED_VAE,
-                                map_location="cpu")["state_dict"]
-        # extract encoder/decoder
-        from collections import OrderedDict
-        vae_dict = OrderedDict()
-        for k, v in state_dict.items():
-            if k.split(".")[0] == "vae":
-                name = k.replace("vae.", "")
-                vae_dict[name] = v
-        model.vae.load_state_dict(vae_dict, strict=True)
-
-
-    # Load pre-trained models if specified
-    if cfg.TRAIN.PRETRAINED:
-        
-        logger.info("Loading pretrain mode from {}".format(
-            cfg.TRAIN.PRETRAINED))
-        logger.info("Attention! VAE will be recovered")
-        state_dict = torch.load(cfg.TRAIN.PRETRAINED,
-                                map_location="cpu")["state_dict"]
-        # remove mismatched and unused params
-        from collections import OrderedDict
-
-        new_state_dict = OrderedDict()
-        for k, v in state_dict.items():
-            if k not in ["denoiser.sequence_pos_encoding.pe"]:
-                new_state_dict[k] = v
-        model.load_state_dict(new_state_dict, strict=False)
 
     # Start training and validation
     if cfg.TRAIN.RESUME:
