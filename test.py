@@ -9,11 +9,11 @@ from rich import get_console
 from rich.table import Table
 from omegaconf import OmegaConf
 
-from mld.callback import ProgressLogger
-from mld.config import parse_args
-from mld.data.get_data import get_datasets
-from mld.models.get_model import get_model
-from mld.utils.logger import create_logger
+from tma.callback import ProgressLogger
+from tma.config import parse_args
+from tma.data.get_data import get_datasets
+from tma.models.get_model import get_model
+from tma.utils.logger import create_logger
 
 use_differnt_t2m = False
 
