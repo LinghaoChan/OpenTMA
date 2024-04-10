@@ -7,7 +7,7 @@ from .word_vectorizer import POS_enumerator
 
 def is_float(numStr):
     flag = False
-    numStr = str(numStr).strip().lstrip('-').lstrip('+')    # 去除正数(+)、负数(-)符号
+    numStr = str(numStr).strip().lstrip('-').lstrip('+')
     try:
         reg = re.compile(r'^[-+]?[0-9]+\.[0-9]+$')
         res = reg.match(str(numStr))
@@ -20,7 +20,7 @@ def is_float(numStr):
 
 def is_number(numStr):
     flag = False
-    numStr = str(numStr).strip().lstrip('-').lstrip('+')    # 去除正数(+)、负数(-)符号
+    numStr = str(numStr).strip().lstrip('-').lstrip('+')
     if str(numStr).isdigit():
         flag = True
     return flag

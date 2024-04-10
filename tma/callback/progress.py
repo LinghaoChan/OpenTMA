@@ -16,34 +16,35 @@ class ProgressLogger(Callback):
         self.metric_monitor = metric_monitor
         self.precision = precision
 
-    def on_train_start(self, trainer: Trainer, pl_module: LightningModule,
-                       **kwargs) -> None:
+    def on_train_start(
+        self, trainer: Trainer, pl_module: LightningModule, **kwargs
+    ) -> None:
         # Log a message when training starts
         logger.info("Training started")
 
-    def on_train_end(self, trainer: Trainer, pl_module: LightningModule,
-                     **kwargs) -> None:
+    def on_train_end(
+        self, trainer: Trainer, pl_module: LightningModule, **kwargs
+    ) -> None:
         # Log a message when training ends
         logger.info("Training done")
 
-    def on_validation_epoch_end(self, trainer: Trainer,
-                                pl_module: LightningModule, **kwargs) -> None:
+    def on_validation_epoch_end(
+        self, trainer: Trainer, pl_module: LightningModule, **kwargs
+    ) -> None:
         # Log a message when a validation epoch ends
         if trainer.sanity_checking:
             logger.info("Sanity checking ok.")
 
-    def on_train_epoch_end(self,
-                           trainer: Trainer,
-                           pl_module: LightningModule,
-                           padding=False,
-                           **kwargs) -> None:
+    def on_train_epoch_end(
+        self, trainer: Trainer, pl_module: LightningModule, padding=False, **kwargs
+    ) -> None:
         # Log a message when a training epoch ends
         # Format for logging metrics
         metric_format = f"{{:.{self.precision}e}}"
         # Start the log line with the epoch number
         line = f"Epoch {trainer.current_epoch}"
         if padding:
-            line = f"{line:>{len('Epoch xxxx')}}"   # Right padding
+            line = f"{line:>{len('Epoch xxxx')}}"  # Right padding
         metrics_str = []
 
         losses_dict = trainer.callback_metrics

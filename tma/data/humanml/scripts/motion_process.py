@@ -202,8 +202,6 @@ def process_file(positions, feet_thre):
     # forward (3,)
     forward_init = forward_init / np.sqrt((forward_init ** 2).sum(axis=-1))[..., np.newaxis]
 
-    #     print(forward_init)
-
     target = np.array([[0, 0, 1]])
     root_quat_init = qbetween_np(forward_init, target)
     root_quat_init = np.ones(positions.shape[:-1] + (4,)) * root_quat_init
@@ -217,12 +215,6 @@ def process_file(positions, feet_thre):
     '''New ground truth positions'''
     global_positions = positions.copy()
 
-    # plt.plot(positions_b[:, 0, 0], positions_b[:, 0, 2], marker='*')
-    # plt.plot(positions[:, 0, 0], positions[:, 0, 2], marker='o', color='r')
-    # plt.xlabel('x')
-    # plt.ylabel('z')
-    # plt.axis('equal')
-    # plt.show()
 
     """ Get Foot Contacts """
 
@@ -307,15 +299,6 @@ def process_file(positions, feet_thre):
     #     trejec = np.cumsum(np.concatenate([np.array([[0, 0, 0]]), velocity], axis=0), axis=0)
     #     r_rotations, r_pos = recover_ric_glo_np(r_velocity, velocity[:, [0, 2]])
 
-    # plt.plot(positions_b[:, 0, 0], positions_b[:, 0, 2], marker='*')
-    # plt.plot(ground_positions[:, 0, 0], ground_positions[:, 0, 2], marker='o', color='r')
-    # plt.plot(trejec[:, 0], trejec[:, 2], marker='^', color='g')
-    # plt.plot(r_pos[:, 0], r_pos[:, 2], marker='s', color='y')
-    # plt.xlabel('x')
-    # plt.ylabel('z')
-    # plt.axis('equal')
-    # plt.show()
-
     '''Root height'''
     root_y = positions[:, 0, 1:2]
 
@@ -324,7 +307,7 @@ def process_file(positions, feet_thre):
     # (seq_len-1, 2) linear velovity on xz plane
     r_velocity = np.arcsin(r_velocity[:, 2:3])
     l_velocity = velocity[:, [0, 2]]
-    #     print(r_velocity.shape, l_velocity.shape, root_y.shape)
+    
     root_data = np.concatenate([r_velocity, l_velocity, root_y[:-1]], axis=-1)
 
     '''Get Joint Rotation Representation'''
