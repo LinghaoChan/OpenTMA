@@ -66,8 +66,10 @@ def main():
     # create logger
     logger = create_logger(cfg, phase="test")
     output_dir = Path(
-        os.path.join(cfg.FOLDER, str(cfg.model.model_type), str(cfg.NAME),
-                     "samples_" + cfg.TIME))
+        os.path.join(
+            cfg.FOLDER, str(cfg.model.model_type), str(cfg.NAME), "samples_" + cfg.TIME
+        )
+    )
     output_dir.mkdir(parents=True, exist_ok=True)
     logger.info(OmegaConf.to_yaml(cfg))
 
@@ -81,8 +83,7 @@ def main():
 
     # create dataset
     datasets = get_datasets(cfg, logger=logger, phase="test")[0]
-    logger.info("datasets module {} initialized".format("".join(
-        cfg.TRAIN.DATASETS)))
+    logger.info("datasets module {} initialized".format("".join(cfg.TRAIN.DATASETS)))
 
     # create model
     model = get_model(cfg, datasets)
@@ -126,18 +127,16 @@ def main():
     # loading state dict
     logger.info("Loading checkpoints from {}".format(cfg.TEST.CHECKPOINTS))
 
-    state_dict = torch.load(cfg.TEST.CHECKPOINTS,
-                            map_location="cpu")["state_dict"]
+    state_dict = torch.load(cfg.TEST.CHECKPOINTS, map_location="cpu")["state_dict"]
     model.load_state_dict(state_dict)
 
     if use_differnt_t2m:
         t2m_checkpoint = torch.load(
-            '/comp_robot/lushunlin/motion-latent-diffusion/deps/t2m/motionx/version1/smplx_212/text_mot_match_glove_6B_caption_bs_256/model/finest.tar')
+            "/comp_robot/lushunlin/motion-latent-diffusion/deps/t2m/motionx/version1/smplx_212/text_mot_match_glove_6B_caption_bs_256/model/finest.tar"
+        )
         model.t2m_textencoder.load_state_dict(t2m_checkpoint["text_encoder"])
-        model.t2m_moveencoder.load_state_dict(
-            t2m_checkpoint["movement_encoder"])
-        model.t2m_motionencoder.load_state_dict(
-            t2m_checkpoint["motion_encoder"])
+        model.t2m_moveencoder.load_state_dict(t2m_checkpoint["movement_encoder"])
+        model.t2m_motionencoder.load_state_dict(t2m_checkpoint["motion_encoder"])
 
         # freeze params
         model.t2m_textencoder.eval()
@@ -150,7 +149,9 @@ def main():
         for p in model.t2m_motionencoder.parameters():
             p.requires_grad = False
 
-        print('Loading /comp_robot/lushunlin/motion-latent-diffusion/deps/t2m/motionx/version1/smplx_212/text_mot_match_glove_6B_caption_bs_256/model/finest.tar')
+        print(
+            "Loading /comp_robot/lushunlin/motion-latent-diffusion/deps/t2m/motionx/version1/smplx_212/text_mot_match_glove_6B_caption_bs_256/model/finest.tar"
+        )
 
     all_metrics = {}
     replication_times = cfg.TEST.REPLICATION_TIMES
@@ -175,8 +176,7 @@ def main():
     # set up metrics
     all_metrics_new = {}
     for key, item in all_metrics.items():
-        mean, conf_interval = get_metric_statistics(np.array(item),
-                                                    replication_times)
+        mean, conf_interval = get_metric_statistics(np.array(item), replication_times)
         all_metrics_new[key + "/mean"] = mean
         all_metrics_new[key + "/conf_interval"] = conf_interval
     print_table(f"Mean Metrics", all_metrics_new)

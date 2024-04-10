@@ -97,8 +97,9 @@ def main(args):
         sbert_embedding = np.load(sbert_emb_dir)
 
         # Normalize the SBERT embeddings.
-        sbert_embedding = sbert_embedding / \
-            np.linalg.norm(sbert_embedding, axis=1, keepdims=True)
+        sbert_embedding = sbert_embedding / np.linalg.norm(
+            sbert_embedding, axis=1, keepdims=True
+        )
 
         # Calculate the text-to-motion and motion-to-text similarity matrices.
         T2M_logits = text_embedding @ (motion_embedding.T)
@@ -159,17 +160,17 @@ def main(args):
                 RecK_list[index].append("%.3f" % (100.0 * (hits / N)))
 
     # To markdown table format
-    print('|   Metrics   |', end='  ')
+    print("|   Metrics   |", end="  ")
     for k in K_list:
-        print(f'Recall @{k} |', end='  ')
+        print(f"Recall @{k} |", end="  ")
     print()
-    print('|-------------|', end='  ')
+    print("|-------------|", end="  ")
     for k in K_list:
-        print('--------- |', end='  ')
+        print("--------- |", end="  ")
     print()
     for l in range(len(RecK_list)):
         exp_name = expdirs[l].split("/")[-2]
-        print(f'|{exp_name} |', end='  ')
+        print(f"|{exp_name} |", end="  ")
         for item in RecK_list[l]:
             print(item, end="   |")
         print("")
@@ -181,8 +182,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     # Add arguments for retrieval type, protocol, and experiment directories
-    parser.add_argument("--retrieval_type", default="T2M",
-                        type=str, help="T2M or M2T")
+    parser.add_argument("--retrieval_type", default="T2M", type=str, help="T2M or M2T")
     parser.add_argument("--protocal", default="A", type=str, help="A, B, or D")
     parser.add_argument("--expdirs", nargs="+")
 

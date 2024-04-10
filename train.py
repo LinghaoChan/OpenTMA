@@ -31,18 +31,21 @@ def main():
                     cfg = OmegaConf.load(os.path.join(resume, item))
                     cfg.TRAIN = backcfg
                     break
-            checkpoints = sorted(os.listdir(os.path.join(
-                resume, "checkpoints")),
-                                 key=lambda x: int(x[6:-5]),
-                                 reverse=True)
+            checkpoints = sorted(
+                os.listdir(os.path.join(resume, "checkpoints")),
+                key=lambda x: int(x[6:-5]),
+                reverse=True,
+            )
             for checkpoint in checkpoints:
                 if "epoch=" in checkpoint:
                     cfg.TRAIN.PRETRAINED = os.path.join(
-                        resume, "checkpoints", checkpoint)
+                        resume, "checkpoints", checkpoint
+                    )
                     break
             if os.path.exists(os.path.join(resume, "wandb")):
-                wandb_list = sorted(os.listdir(os.path.join(resume, "wandb")),
-                                    reverse=True)
+                wandb_list = sorted(
+                    os.listdir(os.path.join(resume, "wandb")), reverse=True
+                )
                 for item in wandb_list:
                     if "run-" in item:
                         cfg.LOGGER.WANDB.RESUME_ID = item.split("-")[-1]
@@ -52,7 +55,7 @@ def main():
 
     # Set a seed for reproducibility
     pl.seed_everything(cfg.SEED_VALUE)
-    
+
     # If the accelerator is a GPU, disable tokenizers parallelism
     if cfg.ACCELERATOR == "gpu":
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -72,22 +75,20 @@ def main():
         )
         loggers.append(wandb_logger)
     if cfg.LOGGER.TENSORBOARD:
-        tb_logger = pl_loggers.TensorBoardLogger(save_dir=cfg.FOLDER_EXP,
-                                                 sub_dir="tensorboard",
-                                                 version="",
-                                                 name="")
+        tb_logger = pl_loggers.TensorBoardLogger(
+            save_dir=cfg.FOLDER_EXP, sub_dir="tensorboard", version="", name=""
+        )
         loggers.append(tb_logger)
     logger.info(OmegaConf.to_yaml(cfg))
-    
+
     # create dataset
     datasets = get_datasets(cfg, logger=logger)
-    logger.info("datasets module {} initialized".format("".join(
-        cfg.TRAIN.DATASETS)))
-    
+    logger.info("datasets module {} initialized".format("".join(cfg.TRAIN.DATASETS)))
+
     # create model
     model = get_model(cfg, datasets[0])
     logger.info("model {} loaded".format(cfg.model.model_type))
-    
+
     # Define metrics to monitor
     metric_monitor = {
         # "Train_jf": "recons/text2jfeats/train",
@@ -154,18 +155,15 @@ def main():
     )
     logger.info("Trainer initialized")
 
-    if cfg.TRAIN.STAGE == 'temos':
-        vae_type = 'temos'
+    if cfg.TRAIN.STAGE == "temos":
+        vae_type = "temos"
     else:
-        vae_type = cfg.model.motion_vae.target.split(".")[-1].lower().replace(
-            "vae", "")
+        vae_type = cfg.model.motion_vae.target.split(".")[-1].lower().replace("vae", "")
 
     # Start training and validation
     if cfg.TRAIN.RESUME:
         trainer.validate(model, datamodule=datasets[0], ckpt_path=cfg.TRAIN.PRETRAINED)
-        trainer.fit(model,
-                    datamodule=datasets[0],
-                    ckpt_path=cfg.TRAIN.PRETRAINED)
+        trainer.fit(model, datamodule=datasets[0], ckpt_path=cfg.TRAIN.PRETRAINED)
     else:
         trainer.validate(model, datamodule=datasets[0])
         trainer.fit(model, datamodule=datasets[0])
