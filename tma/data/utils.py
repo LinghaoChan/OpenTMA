@@ -4,7 +4,8 @@ import torch
 def lengths_to_mask(lengths):
     max_len = max(lengths)
     mask = torch.arange(max_len, device=lengths.device).expand(
-        len(lengths), max_len) < lengths.unsqueeze(1)
+        len(lengths), max_len
+    ) < lengths.unsqueeze(1)
     return mask
 
 
@@ -12,7 +13,7 @@ def lengths_to_mask(lengths):
 def collate_tensors(batch):
     dims = batch[0].dim()
     max_size = [max([b.size(i) for b in batch]) for i in range(dims)]
-    size = (len(batch), ) + tuple(max_size)
+    size = (len(batch),) + tuple(max_size)
     canvas = batch[0].new_zeros(size=size)
     for i, b in enumerate(batch):
         sub_tensor = canvas[i]
@@ -34,9 +35,11 @@ def all_collate(batch):
     databatchTensor = collate_tensors(databatch)
     # labelbatchTensor = torch.as_tensor(labelbatch)
     lenbatchTensor = torch.as_tensor(lenbatch)
-    maskbatchTensor = (lengths_to_mask(
-        lenbatchTensor, databatchTensor.shape[-1]).unsqueeze(1).unsqueeze(1)
-                       )  # unqueeze for broadcasting
+    maskbatchTensor = (
+        lengths_to_mask(lenbatchTensor, databatchTensor.shape[-1])
+        .unsqueeze(1)
+        .unsqueeze(1)
+    )  # unqueeze for broadcasting
 
     motion = databatchTensor
     cond = {"y": {"mask": maskbatchTensor, "lengths": lenbatchTensor}}
@@ -59,20 +62,23 @@ def tma_collate(batch):
     notnone_batches.sort(key=lambda x: x[3], reverse=True)
     # batch.sort(key=lambda x: x[3], reverse=True)
     adapted_batch = {
-        "motion":
-        collate_tensors([torch.tensor(b[4]).float() for b in notnone_batches]),
+        "motion": collate_tensors(
+            [torch.tensor(b[4]).float() for b in notnone_batches]
+        ),
         "text": [b[2] for b in notnone_batches],
         "length": [b[5] for b in notnone_batches],
-        "word_embs":
-        collate_tensors([torch.tensor(b[0]).float() for b in notnone_batches]),
-        "pos_ohot":
-        collate_tensors([torch.tensor(b[1]).float() for b in notnone_batches]),
-        "text_len":
-        collate_tensors([torch.tensor(b[3]) for b in notnone_batches]),
+        "word_embs": collate_tensors(
+            [torch.tensor(b[0]).float() for b in notnone_batches]
+        ),
+        "pos_ohot": collate_tensors(
+            [torch.tensor(b[1]).float() for b in notnone_batches]
+        ),
+        "text_len": collate_tensors([torch.tensor(b[3]) for b in notnone_batches]),
         "tokens": [b[6] for b in notnone_batches],
         "retrieval_name": [b[7] for b in notnone_batches],
     }
     return adapted_batch
+
 
 def tma_collate_text_all(batch):
     # import pdb; pdb.set_trace()
@@ -80,23 +86,27 @@ def tma_collate_text_all(batch):
     notnone_batches.sort(key=lambda x: x[3], reverse=True)
     # batch.sort(key=lambda x: x[3], reverse=True)
     adapted_batch = {
-        "motion":
-        collate_tensors([torch.tensor(b[4]).float() for b in notnone_batches]),
+        "motion": collate_tensors(
+            [torch.tensor(b[4]).float() for b in notnone_batches]
+        ),
         "text": [b[2] for b in notnone_batches],
         "length": [b[5] for b in notnone_batches],
-        "word_embs":
-        collate_tensors([torch.tensor(b[0]).float() for b in notnone_batches]),
-        "pos_ohot":
-        collate_tensors([torch.tensor(b[1]).float() for b in notnone_batches]),
-        "text_len":
-        collate_tensors([torch.tensor(b[3]).float() for b in notnone_batches]),
+        "word_embs": collate_tensors(
+            [torch.tensor(b[0]).float() for b in notnone_batches]
+        ),
+        "pos_ohot": collate_tensors(
+            [torch.tensor(b[1]).float() for b in notnone_batches]
+        ),
+        "text_len": collate_tensors(
+            [torch.tensor(b[3]).float() for b in notnone_batches]
+        ),
         "tokens": [b[6] for b in notnone_batches],
         "body_text": [b[7] for b in notnone_batches],
         "hand_text": [b[8] for b in notnone_batches],
         "face_text": [b[9] for b in notnone_batches],
-
     }
     return adapted_batch
+
 
 def a2m_collate(batch):
 
@@ -115,6 +125,6 @@ def a2m_collate(batch):
         "action": labelbatchTensor,
         "action_text": labeltextbatch,
         "mask": maskbatchTensor,
-        "length": lenbatchTensor
+        "length": lenbatchTensor,
     }
     return adapted_batch

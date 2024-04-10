@@ -33,7 +33,8 @@ class BASEDataModule(pl.LightningDataModule):
         # import pdb; pdb.set_trace()
 
         split_file = pjoin(
-            eval(f"self.cfg.DATASET.{self.name.upper()}.SPLIT_ROOT"), self.cfg.DATASET.VERSION, 
+            eval(f"self.cfg.DATASET.{self.name.upper()}.SPLIT_ROOT"),
+            self.cfg.DATASET.VERSION,
             self.cfg.EVAL.SPLIT + ".txt",
         )
         # import pdb; pdb.set_trace()
@@ -42,7 +43,7 @@ class BASEDataModule(pl.LightningDataModule):
     def __getattr__(self, item):
         # train_dataset/val_dataset etc cached like properties
         if item.endswith("_dataset") and not item.startswith("_"):
-            subset = item[:-len("_dataset")]
+            subset = item[: -len("_dataset")]
             item_c = "_" + item
             if item_c not in self.__dict__:
                 # todo: config name not consistent
@@ -50,12 +51,12 @@ class BASEDataModule(pl.LightningDataModule):
                 split = eval(f"self.cfg.{subset}.SPLIT")
                 split_file = pjoin(
                     eval(f"self.cfg.DATASET.{self.name.upper()}.SPLIT_ROOT"),
-                    self.cfg.DATASET.VERSION, 
+                    self.cfg.DATASET.VERSION,
                     eval(f"self.cfg.{subset}.SPLIT") + ".txt",
                 )
-                self.__dict__[item_c] = self.Dataset(split_file=split_file,
-                                                     split=split,
-                                                     **self.hparams)
+                self.__dict__[item_c] = self.Dataset(
+                    split_file=split_file, split=split, **self.hparams
+                )
             return getattr(self, item_c)
         classname = self.__class__.__name__
         raise AttributeError(f"'{classname}' object has no attribute '{item}'")
@@ -79,8 +80,7 @@ class BASEDataModule(pl.LightningDataModule):
 
     def predict_dataloader(self):
         dataloader_options = self.dataloader_options.copy()
-        dataloader_options[
-            "batch_size"] = 1 if self.is_mm else self.cfg.TEST.BATCH_SIZE
+        dataloader_options["batch_size"] = 1 if self.is_mm else self.cfg.TEST.BATCH_SIZE
         dataloader_options["num_workers"] = self.cfg.TEST.NUM_WORKERS
         dataloader_options["shuffle"] = False
         return DataLoader(
@@ -105,8 +105,7 @@ class BASEDataModule(pl.LightningDataModule):
     def test_dataloader(self):
         # overrides batch_size and num_workers
         dataloader_options = self.dataloader_options.copy()
-        dataloader_options[
-            "batch_size"] = 1 if self.is_mm else self.cfg.TEST.BATCH_SIZE
+        dataloader_options["batch_size"] = 1 if self.is_mm else self.cfg.TEST.BATCH_SIZE
         dataloader_options["num_workers"] = self.cfg.TEST.NUM_WORKERS
         # dataloader_options["drop_last"] = True
         dataloader_options["shuffle"] = False
