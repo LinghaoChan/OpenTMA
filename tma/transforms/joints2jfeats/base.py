@@ -11,7 +11,8 @@ class Joints2Jfeats(nn.Module):
                  eps: float = 1e-12,
                  **kwargs) -> None:
         if normalization and path is None:
-            raise TypeError("You should provide a path if normalization is on.")
+            raise TypeError(
+                "You should provide a path if normalization is on.")
 
         super().__init__()
         self.normalization = normalization
