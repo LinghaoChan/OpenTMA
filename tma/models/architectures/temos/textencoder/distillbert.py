@@ -10,6 +10,7 @@ from torch.distributions.distribution import Distribution
 from transformers import AutoTokenizer, AutoModel
 from transformers import logging
 
+
 class DistilbertEncoderBase(pl.LightningModule):
     """
     This class is a base encoder for DistilBERT models.
@@ -24,8 +25,7 @@ class DistilbertEncoderBase(pl.LightningModule):
     - train: sets the training mode for the model.
     """
 
-    def __init__(self, modelpath: str,
-                 finetune: bool = False):
+    def __init__(self, modelpath: str, finetune: bool = False):
         """
         Initializes the DistilbertEncoderBase object with the given parameters.
 
@@ -37,14 +37,14 @@ class DistilbertEncoderBase(pl.LightningModule):
         """
         super().__init__()
         logging.set_verbosity_error()
-        
+
         # Tokenizer
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
         self.tokenizer = AutoTokenizer.from_pretrained(modelpath)
 
         # Text model
         self.text_model = AutoModel.from_pretrained(modelpath)
-        
+
         # Don't train the model
         if not finetune:
             self.text_model.training = False
@@ -71,9 +71,7 @@ class DistilbertEncoderBase(pl.LightningModule):
             module.train(mode)
         return self
 
-    def get_last_hidden_state(self, texts: List[str],
-                              return_mask: bool = False
-                              ):
+    def get_last_hidden_state(self, texts: List[str], return_mask: bool = False):
         """
         Sets the training mode for the model.
 
@@ -83,15 +81,14 @@ class DistilbertEncoderBase(pl.LightningModule):
         Outputs: None
         """
         # Tokenize the texts and convert them to tensors
-        encoded_inputs = self.tokenizer(
-            texts, return_tensors="pt", padding=True)
-        
+        encoded_inputs = self.tokenizer(texts, return_tensors="pt", padding=True)
+
         # Pass the encoded inputs to the DistilBERT model
         output = self.text_model(**encoded_inputs.to(self.text_model.device))
-        
+
         # If not returning the attention mask, return the last hidden state
         if not return_mask:
             return output.last_hidden_state
-        
+
         # If returning the attention mask, return the last hidden state and the attention mask
         return output.last_hidden_state, encoded_inputs.attention_mask.to(dtype=bool)

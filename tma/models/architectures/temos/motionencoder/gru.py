@@ -27,9 +27,14 @@ class GRUEncoder(pl.LightningModule):
     - forward: encodes the input features and returns the encoded output.
     """
 
-    def __init__(self, nfeats: int, vae: bool,
-                 latent_dim: int = 256,
-                 num_layers: int = 4, **kwargs):
+    def __init__(
+        self,
+        nfeats: int,
+        vae: bool,
+        latent_dim: int = 256,
+        num_layers: int = 4,
+        **kwargs
+    ):
         """
         Initializes the GRUEncoder object with the given parameters.
 
@@ -44,7 +49,7 @@ class GRUEncoder(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters(logger=False)
         input_feats = nfeats
-        
+
         # Embed the input features
         self.skel_embedding = nn.Linear(input_feats, latent_dim)
 
@@ -91,8 +96,16 @@ class GRUEncoder(pl.LightningModule):
         x = x.permute(1, 0, 2)  # now it is [nframes, bs, latent_dim]
 
         # Extract the last valid input
-        x = x[tuple(torch.stack((torch.arange(bs, device=x.device),
-                                 torch.tensor(lengths, device=x.device)-1)))]
+        x = x[
+            tuple(
+                torch.stack(
+                    (
+                        torch.arange(bs, device=x.device),
+                        torch.tensor(lengths, device=x.device) - 1,
+                    )
+                )
+            )
+        ]
 
         if self.hparams.vae:
             mu = self.mu(x)

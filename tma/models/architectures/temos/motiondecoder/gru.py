@@ -20,9 +20,9 @@ class GRUDecoder(pl.LightningModule):
         num_layers (int, optional): The number of layers in the GRU model. Defaults to 4.
     """
 
-    def __init__(self, nfeats: int,
-                 latent_dim: int = 256,
-                 num_layers: int = 4, **kwargs) -> None:
+    def __init__(
+        self, nfeats: int, latent_dim: int = 256, num_layers: int = 4, **kwargs
+    ) -> None:
 
         super().__init__()
         self.save_hyperparameters(logger=False)
@@ -30,7 +30,7 @@ class GRUDecoder(pl.LightningModule):
         output_feats = nfeats
 
         # Embedding layer to transform the input
-        self.emb_layer = nn.Linear(latent_dim+1, latent_dim)
+        self.emb_layer = nn.Linear(latent_dim + 1, latent_dim)
 
         # GRU layer
         self.gru = nn.GRU(latent_dim, latent_dim, num_layers=num_layers)
@@ -62,9 +62,8 @@ class GRUDecoder(pl.LightningModule):
         z = z[None].repeat((nframes, 1, 1))
 
         # Add time information to the input
-        time = mask * 1/(lengths[..., None]-1)
-        time = (time[:, None] *
-                torch.arange(time.shape[1], device=z.device))[:, 0]
+        time = mask * 1 / (lengths[..., None] - 1)
+        time = (time[:, None] * torch.arange(time.shape[1], device=z.device))[:, 0]
         time = time.T[..., None]
         z = torch.cat((z, time), 2)
 

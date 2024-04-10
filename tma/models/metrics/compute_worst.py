@@ -12,7 +12,10 @@ class ComputeMetricsWorst(ComputeMetrics):
     """
     This class is used to compute the worst metrics. It extends the ComputeMetrics class.
     """
-    def update(self, jts_text_: List[Tensor], jts_ref_: List[Tensor], lengths: List[List[int]]):
+
+    def update(
+        self, jts_text_: List[Tensor], jts_ref_: List[Tensor], lengths: List[List[int]]
+    ):
         """
         This method updates the metrics.
 
@@ -30,15 +33,19 @@ class ComputeMetricsWorst(ComputeMetrics):
         # Initialize the number of trials and the metrics list
         ntrials = len(jts_text_)
         metrics = []
-        
+
         # Loop over each trial
         for index in range(ntrials):
             # Transform the text and reference tensors
-            jts_text, poses_text, root_text, traj_text = self.transform(jts_text_[index], lengths[index])
-            jts_ref, poses_ref, root_ref, traj_ref = self.transform(jts_ref_[index], lengths[index])
+            jts_text, poses_text, root_text, traj_text = self.transform(
+                jts_text_[index], lengths[index]
+            )
+            jts_ref, poses_ref, root_ref, traj_ref = self.transform(
+                jts_ref_[index], lengths[index]
+            )
 
             mets = []
-            
+
             # Loop over each length
             for i in range(len(lengths[index])):
                 # Compute the root, pose, trajectory, and joints metrics
@@ -65,16 +72,33 @@ class ComputeMetricsWorst(ComputeMetrics):
                 AVE_joints = l2_norm(jts_sigma_text, jts_sigma_ref, dim=1)
 
                 # Append the metrics to the metrics list for this trial
-                met = [APE_root, APE_pose, APE_traj, APE_joints,
-                       AVE_root, AVE_pose, AVE_traj, AVE_joints]
+                met = [
+                    APE_root,
+                    APE_pose,
+                    APE_traj,
+                    APE_joints,
+                    AVE_root,
+                    AVE_pose,
+                    AVE_traj,
+                    AVE_joints,
+                ]
                 mets.append(met)
-            
+
             # Append the metrics for this trial to the overall metrics list
             metrics.append(mets)
 
         # Quick hacks
         mmm = metrics[np.argmax([x[0][0] for x in metrics])]
-        APE_root, APE_pose, APE_traj, APE_joints, AVE_root, AVE_pose, AVE_traj, AVE_joints = mmm[0]
+        (
+            APE_root,
+            APE_pose,
+            APE_traj,
+            APE_joints,
+            AVE_root,
+            AVE_pose,
+            AVE_traj,
+            AVE_joints,
+        ) = mmm[0]
         self.APE_root += APE_root
         self.APE_pose += APE_pose
         self.APE_traj += APE_traj

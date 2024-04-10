@@ -16,13 +16,15 @@ class ComputeMetrics(Metric):
     """
     This class is used to compute metrics. It extends the Metric class.
     """
-    
-    def __init__(self,
-                 njoints,
-                 jointstype: str = "mmm",
-                 force_in_meter: bool = True,
-                 dist_sync_on_step=True,
-                 **kwargs):
+
+    def __init__(
+        self,
+        njoints,
+        jointstype: str = "mmm",
+        force_in_meter: bool = True,
+        dist_sync_on_step=True,
+        **kwargs
+    ):
         """
         This is the constructor for the ComputeMetrics class.
 
@@ -43,52 +45,38 @@ class ComputeMetrics(Metric):
             raise NotImplementedError("This jointstype is not implemented.")
 
         # Initialize the name, jointstype, and rifke attributes
-        self.name = 'APE and AVE'
+        self.name = "APE and AVE"
         self.jointstype = jointstype
         self.rifke = Rifke(jointstype=jointstype, normalization=False)
 
         self.force_in_meter = force_in_meter
-        
+
         # Initialize the count and count_seq states
         self.add_state("count", default=torch.tensor(0), dist_reduce_fx="sum")
-        self.add_state("count_seq",
-                       default=torch.tensor(0),
-                       dist_reduce_fx="sum")
+        self.add_state("count_seq", default=torch.tensor(0), dist_reduce_fx="sum")
 
         # Initialize the APE_root and APE_traj states
-        self.add_state("APE_root",
-                       default=torch.tensor(0.),
-                       dist_reduce_fx="sum")
-        self.add_state("APE_traj",
-                       default=torch.tensor(0.),
-                       dist_reduce_fx="sum")
-        
+        self.add_state("APE_root", default=torch.tensor(0.0), dist_reduce_fx="sum")
+        self.add_state("APE_traj", default=torch.tensor(0.0), dist_reduce_fx="sum")
+
         # Initialize the APE_root and APE_traj states
-        self.add_state("APE_pose",
-                       default=torch.zeros(njoints - 1),
-                       dist_reduce_fx="sum")
-        self.add_state("APE_joints",
-                       default=torch.zeros(njoints),
-                       dist_reduce_fx="sum")
-        
+        self.add_state(
+            "APE_pose", default=torch.zeros(njoints - 1), dist_reduce_fx="sum"
+        )
+        self.add_state("APE_joints", default=torch.zeros(njoints), dist_reduce_fx="sum")
+
         # Define the list of APE metrics
         self.APE_metrics = ["APE_root", "APE_traj", "APE_pose", "APE_joints"]
 
         # Initialize the AVE_root and AVE_traj states
-        self.add_state("AVE_root",
-                       default=torch.tensor(0.),
-                       dist_reduce_fx="sum")
-        self.add_state("AVE_traj",
-                       default=torch.tensor(0.),
-                       dist_reduce_fx="sum")
-        
+        self.add_state("AVE_root", default=torch.tensor(0.0), dist_reduce_fx="sum")
+        self.add_state("AVE_traj", default=torch.tensor(0.0), dist_reduce_fx="sum")
+
         # Initialize the AVE_pose and AVE_joints states
-        self.add_state("AVE_pose",
-                       default=torch.zeros(njoints - 1),
-                       dist_reduce_fx="sum")
-        self.add_state("AVE_joints",
-                       default=torch.zeros(njoints),
-                       dist_reduce_fx="sum")
+        self.add_state(
+            "AVE_pose", default=torch.zeros(njoints - 1), dist_reduce_fx="sum"
+        )
+        self.add_state("AVE_joints", default=torch.zeros(njoints), dist_reduce_fx="sum")
         self.AVE_metrics = ["AVE_root", "AVE_traj", "AVE_pose", "AVE_joints"]
 
         # Combine all metrics into a single list
@@ -107,8 +95,7 @@ class ComputeMetrics(Metric):
         # Compute the APE metrics
         count = self.count
         APE_metrics = {
-            metric: getattr(self, metric) / count
-            for metric in self.APE_metrics
+            metric: getattr(self, metric) / count for metric in self.APE_metrics
         }
 
         # Compute average of APEs
@@ -122,8 +109,7 @@ class ComputeMetrics(Metric):
         # Compute the AVE metrics
         count_seq = self.count_seq
         AVE_metrics = {
-            metric: getattr(self, metric) / count_seq
-            for metric in self.AVE_metrics
+            metric: getattr(self, metric) / count_seq for metric in self.AVE_metrics
         }
 
         # Compute average of AVEs
@@ -147,16 +133,14 @@ class ComputeMetrics(Metric):
 
         Outputs: None
         """
-        
+
         # Update the count and count_seq variables
         self.count += sum(lengths)
         self.count_seq += len(lengths)
 
         # Transform the text and reference tensors
-        jts_text, poses_text, root_text, traj_text = self.transform(
-            jts_text, lengths)
-        jts_ref, poses_ref, root_ref, traj_ref = self.transform(
-            jts_ref, lengths)
+        jts_text, poses_text, root_text, traj_text = self.transform(jts_text, lengths)
+        jts_ref, poses_ref, root_ref, traj_ref = self.transform(jts_ref, lengths)
 
         for i in range(len(lengths)):
             # Compute the APE metrics
@@ -197,19 +181,20 @@ class ComputeMetrics(Metric):
         rotations = matrix_of_angles(cos, sin, inv=False)
 
         # Get back the local poses
-        poses_local = rearrange(poses_features,
-                                "... (joints xyz) -> ... joints xyz",
-                                xyz=3)
+        poses_local = rearrange(
+            poses_features, "... (joints xyz) -> ... joints xyz", xyz=3
+        )
 
         # Rotate the poses
-        poses = torch.einsum("...lj,...jk->...lk", poses_local[..., [0, 2]],
-                             rotations)
+        poses = torch.einsum("...lj,...jk->...lk", poses_local[..., [0, 2]], rotations)
         poses = torch.stack(
-            (poses[..., 0], poses_local[..., 1], poses[..., 1]), axis=-1)
+            (poses[..., 0], poses_local[..., 1], poses[..., 1]), axis=-1
+        )
 
         # Rotate the vel_trajectory
-        vel_trajectory = torch.einsum("...j,...jk->...k", vel_trajectory_local,
-                                      rotations)
+        vel_trajectory = torch.einsum(
+            "...j,...jk->...k", vel_trajectory_local, rotations
+        )
         # Integrate the trajectory
         # Already have the good dimensionality
         trajectory = torch.cumsum(vel_trajectory, dim=-2)
@@ -218,9 +203,9 @@ class ComputeMetrics(Metric):
 
         # get the root joint
         root = torch.cat(
-            (trajectory[..., :, [0]], root_y[..., None], trajectory[..., :,
-                                                                    [1]]),
-            dim=-1)
+            (trajectory[..., :, [0]], root_y[..., None], trajectory[..., :, [1]]),
+            dim=-1,
+        )
 
         # Add the root joints (which is still zero)
         poses = torch.cat((0 * poses[..., [0], :], poses), -2)
@@ -232,20 +217,24 @@ class ComputeMetrics(Metric):
 
         if self.force_in_meter:
             # different jointstypes have different scale factors
-            if self.jointstype == 'mmm':
+            if self.jointstype == "mmm":
                 factor = 1000.0
-            elif self.jointstype == 'humanml3d':
+            elif self.jointstype == "humanml3d":
                 factor = 1000.0 * 0.75 / 480.0
-            elif self.jointstype == 'motionx':
+            elif self.jointstype == "motionx":
                 factor = 1000.0
-            
+
             # return results in meters
-            return (remove_padding(poses / factor, lengths),
-                    remove_padding(poses_local / factor, lengths),
-                    remove_padding(root / factor, lengths),
-                    remove_padding(trajectory / factor, lengths))
+            return (
+                remove_padding(poses / factor, lengths),
+                remove_padding(poses_local / factor, lengths),
+                remove_padding(root / factor, lengths),
+                remove_padding(trajectory / factor, lengths),
+            )
         else:
-            return (remove_padding(poses, lengths),
-                    remove_padding(poses_local,
-                                   lengths), remove_padding(root, lengths),
-                    remove_padding(trajectory, lengths))
+            return (
+                remove_padding(poses, lengths),
+                remove_padding(poses_local, lengths),
+                remove_padding(root, lengths),
+                remove_padding(trajectory, lengths),
+            )

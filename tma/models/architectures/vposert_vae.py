@@ -8,20 +8,25 @@ import torch.nn.functional as F
 from torch import Tensor, nn
 from torch.distributions.distribution import Distribution
 
-from tma.models.architectures.tools.embeddings import (TimestepEmbedding,
-                                                       Timesteps)
+from tma.models.architectures.tools.embeddings import TimestepEmbedding, Timesteps
 from tma.models.operator import PositionalEncoding
 from tma.models.operator.cross_attention import (
-    SkipTransformerEncoder, SkipTransformerDecoder, TransformerDecoder,
-    TransformerDecoderLayer, TransformerEncoder, TransformerEncoderLayer)
+    SkipTransformerEncoder,
+    SkipTransformerDecoder,
+    TransformerDecoder,
+    TransformerDecoderLayer,
+    TransformerEncoder,
+    TransformerEncoderLayer,
+)
 from tma.models.operator.position_encoding import build_position_encoding
 from tma.utils.temos_utils import lengths_to_mask
-'''
+
+"""
 vae
 skip connection encoder 
 skip connection decoder
 mem for each decoder layer
-'''
+"""
 
 
 class VPosert(nn.Module):
@@ -37,12 +42,16 @@ class VPosert(nn.Module):
         n_features = 196 * 263
 
         self.encoder_net = nn.Sequential(
-            BatchFlatten(), nn.BatchNorm1d(n_features),
-            nn.Linear(n_features, num_neurons), nn.LeakyReLU(),
-            nn.BatchNorm1d(num_neurons), nn.Dropout(0.1),
+            BatchFlatten(),
+            nn.BatchNorm1d(n_features),
+            nn.Linear(n_features, num_neurons),
+            nn.LeakyReLU(),
+            nn.BatchNorm1d(num_neurons),
+            nn.Dropout(0.1),
             nn.Linear(num_neurons, num_neurons),
             nn.Linear(num_neurons, num_neurons),
-            NormalDistDecoder(num_neurons, self.latentD))
+            NormalDistDecoder(num_neurons, self.latentD),
+        )
 
         self.decoder_net = nn.Sequential(
             nn.Linear(self.latentD, num_neurons),
@@ -60,11 +69,11 @@ class VPosert(nn.Module):
         return feats_rst, q_z
 
     def encode(self, pose_body, lengths: Optional[List[int]] = None):
-        '''
+        """
         :param Pin: Nx(numjoints*3)
         :param rep_type: 'matrot'/'aa' for matrix rotations or axis-angle
         :return:
-        '''
+        """
         q_z = self.encoder_net(pose_body)
         q_z_sample = q_z.rsample()
         return q_z_sample.unsqueeze(0), q_z
@@ -82,7 +91,7 @@ class BatchFlatten(nn.Module):
 
     def __init__(self):
         super(BatchFlatten, self).__init__()
-        self._name = 'batch_flatten'
+        self._name = "batch_flatten"
 
     def forward(self, x):
         return x.view(x.shape[0], -1)
@@ -107,5 +116,6 @@ class NormalDistDecoder(nn.Module):
         self.logvar = nn.Linear(num_feat_in, latentD)
 
     def forward(self, Xout):
-        return torch.distributions.normal.Normal(self.mu(Xout),
-                                                 F.softplus(self.logvar(Xout)))
+        return torch.distributions.normal.Normal(
+            self.mu(Xout), F.softplus(self.logvar(Xout))
+        )

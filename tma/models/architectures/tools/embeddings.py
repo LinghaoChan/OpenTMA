@@ -36,8 +36,8 @@ def get_activation(activation_type):
 
 class MaskedNorm(nn.Module):
     """
-        Original Code from:
-        https://discuss.pytorch.org/t/batchnorm-for-different-sized-samples-in-batch/44251/8
+    Original Code from:
+    https://discuss.pytorch.org/t/batchnorm-for-different-sized-samples-in-batch/44251/8
     """
 
     def __init__(self, norm_type, num_groups, num_features):
@@ -74,7 +74,6 @@ class MaskedNorm(nn.Module):
 #       We might as well convert them into a single module class.
 #       Only difference is the lut vs linear layers.
 class Embeddings(nn.Module):
-
     """
     Simple embeddings class
     """
@@ -161,7 +160,6 @@ class Embeddings(nn.Module):
 
 
 class SpatialEmbeddings(nn.Module):
-
     """
     Simple Linear Projection Layer
     (For encoder outputs to predict glosses)
@@ -242,6 +240,7 @@ class SpatialEmbeddings(nn.Module):
             self.input_size,
         )
 
+
 def get_timestep_embedding(
     timesteps: torch.Tensor,
     embedding_dim: int,
@@ -306,7 +305,9 @@ class TimestepEmbedding(nn.Module):
 
 
 class Timesteps(nn.Module):
-    def __init__(self, num_channels: int, flip_sin_to_cos: bool, downscale_freq_shift: float):
+    def __init__(
+        self, num_channels: int, flip_sin_to_cos: bool, downscale_freq_shift: float
+    ):
         super().__init__()
         self.num_channels = num_channels
         self.flip_sin_to_cos = flip_sin_to_cos

@@ -27,11 +27,18 @@ class ActorAgnosticEncoder(pl.LightningModule):
     - forward: encodes the input features and returns the encoded output.
     """
 
-    def __init__(self, nfeats: int, vae: bool,
-                 latent_dim: int = 256, ff_size: int = 1024,
-                 num_layers: int = 4, num_heads: int = 4,
-                 dropout: float = 0.1,
-                 activation: str = "gelu", **kwargs):
+    def __init__(
+        self,
+        nfeats: int,
+        vae: bool,
+        latent_dim: int = 256,
+        ff_size: int = 1024,
+        num_layers: int = 4,
+        num_heads: int = 4,
+        dropout: float = 0.1,
+        activation: str = "gelu",
+        **kwargs
+    ):
         """
         Initializes the ActorAgnosticEncoder object with the given parameters.
 
@@ -63,15 +70,18 @@ class ActorAgnosticEncoder(pl.LightningModule):
         self.sequence_pos_encoding = PositionalEncoding(latent_dim, dropout)
 
         # Initialize the transformer encoder layer
-        seq_trans_encoder_layer = nn.TransformerEncoderLayer(d_model=latent_dim,
-                                                             nhead=num_heads,
-                                                             dim_feedforward=ff_size,
-                                                             dropout=dropout,
-                                                             activation=activation)
+        seq_trans_encoder_layer = nn.TransformerEncoderLayer(
+            d_model=latent_dim,
+            nhead=num_heads,
+            dim_feedforward=ff_size,
+            dropout=dropout,
+            activation=activation,
+        )
 
         # Initialize the transformer encoder
-        self.seqTransEncoder = nn.TransformerEncoder(seq_trans_encoder_layer,
-                                                     num_layers=num_layers)
+        self.seqTransEncoder = nn.TransformerEncoder(
+            seq_trans_encoder_layer, num_layers=num_layers
+        )
 
     def forward(self, features: Tensor, lengths: Optional[List[int]] = None):
         """
@@ -83,7 +93,7 @@ class ActorAgnosticEncoder(pl.LightningModule):
 
         Outputs: the encoded output.
         """
-        
+
         if lengths is None:
             lengths = [len(feature) for feature in features]
 

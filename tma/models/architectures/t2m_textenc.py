@@ -18,7 +18,7 @@ class TextEncoderBiGRUCo(nn.Module):
             nn.LeakyReLU(0.2, inplace=True),
             nn.Linear(hidden_size, output_size),
         )
-        
+
         self.hidden_size = hidden_size
         self.hidden = nn.Parameter(
             torch.randn((2, 1, self.hidden_size), requires_grad=True)
@@ -42,23 +42,26 @@ class TextEncoderBiGRUCo(nn.Module):
         return self.output_net(gru_last)
 
 
-
 class TextEncoderBiGRUCoV2(nn.Module):
     def __init__(self, word_size, pos_size, hidden_size, output_size, dataset=None):
         super(TextEncoderBiGRUCoV2, self).__init__()
         if dataset == "unimocap":
             self.pos_emb = nn.Linear(pos_size, word_size)
         self.input_emb = nn.Linear(word_size, hidden_size)
-        self.gru = nn.GRU(hidden_size, hidden_size, batch_first=True, bidirectional=True)
+        self.gru = nn.GRU(
+            hidden_size, hidden_size, batch_first=True, bidirectional=True
+        )
         self.output_net = nn.Sequential(
             nn.Linear(hidden_size * 2, hidden_size),
             nn.LayerNorm(hidden_size),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Linear(hidden_size, output_size)
+            nn.Linear(hidden_size, output_size),
         )
 
         self.hidden_size = hidden_size
-        self.hidden = nn.Parameter(torch.randn((2, 1, self.hidden_size), requires_grad=True))
+        self.hidden = nn.Parameter(
+            torch.randn((2, 1, self.hidden_size), requires_grad=True)
+        )
 
     def forward(self, word_embs, cap_lens):
         num_samples = word_embs.shape[0]

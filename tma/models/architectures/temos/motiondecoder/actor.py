@@ -24,11 +24,17 @@ class ActorAgnosticDecoder(pl.LightningModule):
         activation (str, optional): The activation function of intermediate layer, relu or gelu. Defaults to "gelu".
     """
 
-    def __init__(self, nfeats: int,
-                 latent_dim: int = 256, ff_size: int = 1024,
-                 num_layers: int = 4, num_heads: int = 4,
-                 dropout: float = 0.1,
-                 activation: str = "gelu", **kwargs) -> None:
+    def __init__(
+        self,
+        nfeats: int,
+        latent_dim: int = 256,
+        ff_size: int = 1024,
+        num_layers: int = 4,
+        num_heads: int = 4,
+        dropout: float = 0.1,
+        activation: str = "gelu",
+        **kwargs
+    ) -> None:
 
         super().__init__()
         self.save_hyperparameters(logger=False)
@@ -38,14 +44,17 @@ class ActorAgnosticDecoder(pl.LightningModule):
         self.sequence_pos_encoding = PositionalEncoding(latent_dim, dropout)
 
         # Transformer decoder
-        seq_trans_decoder_layer = nn.TransformerDecoderLayer(d_model=latent_dim,
-                                                             nhead=num_heads,
-                                                             dim_feedforward=ff_size,
-                                                             dropout=dropout,
-                                                             activation=activation)
+        seq_trans_decoder_layer = nn.TransformerDecoderLayer(
+            d_model=latent_dim,
+            nhead=num_heads,
+            dim_feedforward=ff_size,
+            dropout=dropout,
+            activation=activation,
+        )
 
-        self.seqTransDecoder = nn.TransformerDecoder(seq_trans_decoder_layer,
-                                                     num_layers=num_layers)
+        self.seqTransDecoder = nn.TransformerDecoder(
+            seq_trans_decoder_layer, num_layers=num_layers
+        )
 
         # Final linear layer
         self.final_layer = nn.Linear(latent_dim, output_feats)
@@ -76,8 +85,9 @@ class ActorAgnosticDecoder(pl.LightningModule):
 
         # Pass through the transformer decoder
         # with the latent vector for memory
-        output = self.seqTransDecoder(tgt=time_queries, memory=z,
-                                      tgt_key_padding_mask=~mask)
+        output = self.seqTransDecoder(
+            tgt=time_queries, memory=z, tgt_key_padding_mask=~mask
+        )
 
         output = self.final_layer(output)
         # zero for padded area

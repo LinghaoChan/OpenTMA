@@ -10,14 +10,19 @@ from tma.utils.temos_utils import lengths_to_mask
 
 
 class DistilbertActorAgnosticEncoder(DistilbertEncoderBase):
-    def __init__(self, modelpath: str,
-                 finetune: bool = False,
-                 vae: bool = True,
-                 latent_dim: int = 256,
-                 ff_size: int = 1024,
-                 num_layers: int = 4, num_heads: int = 4,
-                 dropout: float = 0.1,
-                 activation: str = "gelu", **kwargs):
+    def __init__(
+        self,
+        modelpath: str,
+        finetune: bool = False,
+        vae: bool = True,
+        latent_dim: int = 256,
+        ff_size: int = 1024,
+        num_layers: int = 4,
+        num_heads: int = 4,
+        dropout: float = 0.1,
+        activation: str = "gelu",
+        **kwargs
+    ):
         """
         Initializes the DistilbertActorAgnosticEncoder object with the given parameters.
 
@@ -38,10 +43,9 @@ class DistilbertActorAgnosticEncoder(DistilbertEncoderBase):
         self.save_hyperparameters(logger=False)
 
         encoded_dim = self.text_encoded_dim
-        
+
         # Projection of the text-outputs into the latent space
-        self.projection = nn.Sequential(nn.ReLU(),
-                                        nn.Linear(encoded_dim, latent_dim))
+        self.projection = nn.Sequential(nn.ReLU(), nn.Linear(encoded_dim, latent_dim))
 
         # TransformerVAE adapted from ACTOR
         # Action agnostic: only one set of params
@@ -53,14 +57,17 @@ class DistilbertActorAgnosticEncoder(DistilbertEncoderBase):
 
         self.sequence_pos_encoding = PositionalEncoding(latent_dim, dropout)
 
-        seq_trans_encoder_layer = nn.TransformerEncoderLayer(d_model=latent_dim,
-                                                             nhead=num_heads,
-                                                             dim_feedforward=ff_size,
-                                                             dropout=dropout,
-                                                             activation=activation)
+        seq_trans_encoder_layer = nn.TransformerEncoderLayer(
+            d_model=latent_dim,
+            nhead=num_heads,
+            dim_feedforward=ff_size,
+            dropout=dropout,
+            activation=activation,
+        )
 
-        self.seqTransEncoder = nn.TransformerEncoder(seq_trans_encoder_layer,
-                                                     num_layers=num_layers)
+        self.seqTransEncoder = nn.TransformerEncoder(
+            seq_trans_encoder_layer, num_layers=num_layers
+        )
 
     def forward(self, texts: List[str]):
         text_encoded, mask = self.get_last_hidden_state(texts, return_mask=True)
@@ -103,7 +110,9 @@ class DistilbertActorAgnosticEncoder(DistilbertEncoderBase):
             try:
                 dist = torch.distributions.Normal(mu, std)
             except ValueError:
-                import ipdb; ipdb.set_trace()  # noqa
+                import ipdb
+
+                ipdb.set_trace()  # noqa
                 pass
             return dist
         else:

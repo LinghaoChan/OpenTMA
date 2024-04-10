@@ -11,27 +11,27 @@ from .utils import *
 class Retrieval_Recall_Metrics(Metric):
     full_state_update = True
 
-    def __init__(self,
-                #  top_k=3,
-                #  R_size=32,
-                #  diversity_times=300,
-                mode = ['all'], 
-                 dist_sync_on_step=True,
-                 **kwargs):
+    def __init__(
+        self,
+        #  top_k=3,
+        #  R_size=32,
+        #  diversity_times=300,
+        mode=["all"],
+        dist_sync_on_step=True,
+        **kwargs,
+    ):
         super().__init__(dist_sync_on_step=dist_sync_on_step)
 
         self.name = "Retrieval_recall"
 
-        if 'small_batch' in mode:
+        if "small_batch" in mode:
             self.R_size = R_size
 
         # self.top_k = top_k
-        self.top_k = ['1', '2', '3', '5', '10']
+        self.top_k = ["1", "2", "3", "5", "10"]
 
         self.add_state("count", default=torch.tensor(0), dist_reduce_fx="sum")
-        self.add_state("count_seq",
-                       default=torch.tensor(0),
-                       dist_reduce_fx="sum")
+        self.add_state("count_seq", default=torch.tensor(0), dist_reduce_fx="sum")
 
         self.metrics = []
         # Matching scores
@@ -78,28 +78,29 @@ class Retrieval_Recall_Metrics(Metric):
         # import pdb; pdb.set_trace()
         # cat all embeddings
         shuffle_idx = torch.randperm(count_seq)
-        all_texts = torch.cat(self.text_embeddings,
-                              axis=0).cpu()[shuffle_idx, :]
-        all_genmotions = torch.cat(self.recmotion_embeddings,
-                                   axis=0).cpu()[shuffle_idx, :]
-        all_gtmotions = torch.cat(self.gtmotion_embeddings,
-                                  axis=0).cpu()[shuffle_idx, :]
+        all_texts = torch.cat(self.text_embeddings, axis=0).cpu()[shuffle_idx, :]
+        all_genmotions = torch.cat(self.recmotion_embeddings, axis=0).cpu()[
+            shuffle_idx, :
+        ]
+        all_gtmotions = torch.cat(self.gtmotion_embeddings, axis=0).cpu()[
+            shuffle_idx, :
+        ]
 
         # Compute r-precision
         assert count_seq > self.R_size
         # print("**********************************")
         # print(count_seq)
-        top_k_mat = torch.zeros((self.top_k, ))
+        top_k_mat = torch.zeros((self.top_k,))
         for i in range(count_seq // self.R_size):
             # [bs=32, 1*256]
-            group_texts = all_texts[i * self.R_size:(i + 1) * self.R_size]
+            group_texts = all_texts[i * self.R_size : (i + 1) * self.R_size]
             # [bs=32, 1*256]
-            group_motions = all_genmotions[i * self.R_size:(i + 1) *
-                                           self.R_size]
+            group_motions = all_genmotions[i * self.R_size : (i + 1) * self.R_size]
             # dist_mat = pairwise_euclidean_distance(group_texts, group_motions)
             # [bs=32, 32]
-            dist_mat = euclidean_distance_matrix(group_texts,
-                                                 group_motions).nan_to_num()
+            dist_mat = euclidean_distance_matrix(
+                group_texts, group_motions
+            ).nan_to_num()
             # print(dist_mat[:5])
             self.Matching_score += dist_mat.trace()
             argsmax = torch.argsort(dist_mat, dim=1)
@@ -111,16 +112,16 @@ class Retrieval_Recall_Metrics(Metric):
 
         # Compute r-precision with gt
         assert count_seq > self.R_size
-        top_k_mat = torch.zeros((self.top_k, ))
+        top_k_mat = torch.zeros((self.top_k,))
         for i in range(count_seq // self.R_size):
             # [bs=32, 1*256]
-            group_texts = all_texts[i * self.R_size:(i + 1) * self.R_size]
+            group_texts = all_texts[i * self.R_size : (i + 1) * self.R_size]
             # [bs=32, 1*256]
-            group_motions = all_gtmotions[i * self.R_size:(i + 1) *
-                                          self.R_size]
+            group_motions = all_gtmotions[i * self.R_size : (i + 1) * self.R_size]
             # [bs=32, 32]
-            dist_mat = euclidean_distance_matrix(group_texts,
-                                                 group_motions).nan_to_num()
+            dist_mat = euclidean_distance_matrix(
+                group_texts, group_motions
+            ).nan_to_num()
             # match score
             self.gt_Matching_score += dist_mat.trace()
             argsmax = torch.argsort(dist_mat, dim=1)
@@ -141,10 +142,12 @@ class Retrieval_Recall_Metrics(Metric):
 
         # Compute diversity
         assert count_seq > self.diversity_times
-        metrics["Diversity"] = calculate_diversity_np(all_genmotions,
-                                                      self.diversity_times)
+        metrics["Diversity"] = calculate_diversity_np(
+            all_genmotions, self.diversity_times
+        )
         metrics["gt_Diversity"] = calculate_diversity_np(
-            all_gtmotions, self.diversity_times)
+            all_gtmotions, self.diversity_times
+        )
 
         return {**metrics}
 
@@ -161,10 +164,8 @@ class Retrieval_Recall_Metrics(Metric):
 
         # [bs, nlatent*ndim] <= [bs, nlatent, ndim]
         text_embeddings = torch.flatten(text_embeddings, start_dim=1).detach()
-        recmotion_embeddings = torch.flatten(recmotion_embeddings,
-                                             start_dim=1).detach()
-        gtmotion_embeddings = torch.flatten(gtmotion_embeddings,
-                                            start_dim=1).detach()
+        recmotion_embeddings = torch.flatten(recmotion_embeddings, start_dim=1).detach()
+        gtmotion_embeddings = torch.flatten(gtmotion_embeddings, start_dim=1).detach()
 
         # store all texts and motions
         self.text_embeddings.append(text_embeddings)
