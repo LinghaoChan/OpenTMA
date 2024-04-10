@@ -1,4 +1,3 @@
-#
 """
 runid util.
 Taken from wandb.sdk.lib.runid
