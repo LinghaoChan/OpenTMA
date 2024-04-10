@@ -293,4 +293,3 @@ root_joints = {
 
 def get_root_idx(joinstype):
     return root_joints[joinstype]
-

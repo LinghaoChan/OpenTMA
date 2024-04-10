@@ -19,7 +19,7 @@ def lengths_to_mask(lengths: List[int],
     Returns:
         Tensor: A tensor mask of shape (len(lengths), max_len).
     """
-    
+
     lengths = torch.tensor(lengths, device=device)
     max_len = max_len if max_len else max(lengths)
     mask = torch.arange(max_len, device=device).expand(

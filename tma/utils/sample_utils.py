@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 logger = logging.getLogger(__name__)
 
+
 def cfg_mean_nsamples_resolution(cfg):
     """
     Resolves the number of samples based on the configuration.
@@ -16,7 +17,8 @@ def cfg_mean_nsamples_resolution(cfg):
         If 'mean' is True and 'number_of_samples' is more than 1, it logs an error and sets 'number_of_samples' to 1.
     """
     if cfg.mean and cfg.number_of_samples > 1:
-        logger.error("All the samples will be the mean.. cfg.number_of_samples=1 will be forced.")
+        logger.error(
+            "All the samples will be the mean.. cfg.number_of_samples=1 will be forced.")
         cfg.number_of_samples = 1
 
     return cfg.number_of_samples == 1

@@ -66,7 +66,7 @@ def instantiate_from_config(config):
             return None
         # Otherwise, raise a KeyError
         raise KeyError("Expected key `target` to instantiate.")
-    
+
     # Instantiate the object with the specified class and parameters
     return get_obj_from_str(config["target"])(**config.get("params", dict()))
 
@@ -84,13 +84,13 @@ def parse_args(phase="train"):
     # Create an argument parser
     parser = ArgumentParser()
     group = parser.add_argument_group("Training options")
-    
+
     """
     The function checks if the phase is in the list ["train", "test", "demo"], and if so, it adds arguments related to the configuration file, asset paths, batch size, and device for training. These arguments are added to a group named "Training options" in the argument parser.
     If the phase is "demo", additional arguments related to rendering visualized figures, frame rate, input text, task, output directory, and output file type are added.
     If the phase is "render", arguments related to rendering, such as the configuration file, asset paths, npy motion files, render target, and joint type for the skeleton are added.
     """
-    
+
     if phase in ["train", "test", "demo"]:
         group.add_argument(
             "--cfg",
@@ -125,7 +125,7 @@ def parse_args(phase="train"):
                            help="evaluate existing npys")
 
     if phase == "demo":
-        
+
         group.add_argument("--render",
                            action="store_true",
                            help="Render visulizaed figures")
@@ -182,7 +182,7 @@ def parse_args(phase="train"):
             default="./configs/assets.yaml",
             help="config file for asset paths",
         )
-        
+
         group.add_argument("--npy",
                            type=str,
                            required=False,
@@ -210,15 +210,14 @@ def parse_args(phase="train"):
 
     # remove None params, and create a dictionnary
     params = parser.parse_args()
-    
 
     # update config from files
     cfg_base = OmegaConf.load('./configs/base.yaml')
     cfg_exp = OmegaConf.merge(cfg_base, OmegaConf.load(params.cfg))
-    
+
     cfg_model = get_module_config(cfg_exp.model, cfg_exp.model.target)
     cfg_assets = OmegaConf.load(params.cfg_assets)
-    
+
     # Merge the experiment, model, and assets configurations.
     cfg = OmegaConf.merge(cfg_exp, cfg_model, cfg_assets)
 

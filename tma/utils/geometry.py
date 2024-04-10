@@ -14,6 +14,7 @@
 #
 # Contact: ps-license@tuebingen.mpg.de
 
+import tma.utils.rotation_conversions as rotation_conversions
 import torch
 import numpy as np
 from torch.nn import functional as F
@@ -122,7 +123,7 @@ def quat2mat(quat):
         w2 - x2 + y2 - z2, 2 * yz - 2 * wx, 2 * xz - 2 * wy, 2 * wx + 2 * yz,
         w2 - x2 - y2 + z2
     ],
-                         dim=1).view(batch_size, 3, 3)
+        dim=1).view(batch_size, 3, 3)
     return rotMat
 
 
@@ -421,9 +422,6 @@ def rot6d_to_rotmat(x):
     rot_mats = torch.stack([b1, b2, b3], dim=-1)
 
     return rot_mats
-
-
-import tma.utils.rotation_conversions as rotation_conversions
 
 
 def rot6d(x_rotations, pose_rep):

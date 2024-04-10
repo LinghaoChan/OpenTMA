@@ -12,7 +12,6 @@ def to_numpy(tensor):
         ndarray (numpy.ndarray): The converted numpy array.
 
     Raises:
-        ValueError: If the input is not a PyTorch tensor.
     """
     if torch.is_tensor(tensor):
         return tensor.cpu().numpy()
@@ -55,4 +54,3 @@ def cleanexit():
         sys.exit(0)
     except SystemExit:
         os._exit(0)
-
