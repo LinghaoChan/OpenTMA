@@ -190,7 +190,6 @@ class Text2MotionDataset(data.Dataset):
 
         if self.opt.is_train:
             if m_length != self.max_length:
-                # print("Motion original length:%d_%d"%(m_length, len(motion)))
                 if self.opt.unit_length < 10:
                     coin2 = np.random.choice(["single", "single", "double"])
                 else:
@@ -279,7 +278,6 @@ class UniMocapDataset(data.Dataset):
             maxdata = 10 if tiny else 100
         else:
             maxdata = 1e10
-        # import pdb; pdb.set_trace()
 
         if progress_bar:
             enumerator = enumerate(
@@ -294,22 +292,18 @@ class UniMocapDataset(data.Dataset):
         miss_count = 0
         new_name_list = []
         length_list = []
-        # import pdb; pdb.set_trace()
         for i, name in enumerator:
             if count > maxdata:
                 break
             try:
-                #     import pdb; pdb.set_trace()
                 motion = np.load(pjoin(motion_dir, name + ".npy"))
                 if np.any(np.isnan(motion)):
                     bad_count += 1
                     continue
-                # import pdb; pdb.set_trace()
                 if input_format == 'root_position':
                     motion = motion[..., :4+(njoints-1)*3]
                 elif input_format == 'root_position_vel':
                     motion = np.concatenate((motion[..., :4+(njoints - 1) * 3], motion[..., 4+(njoints - 1) * 9: 4+(njoints - 1) * 9 + njoints*3]), axis=-1)
-                    # import pdb; pdb.set_trace()
                 elif input_format == 'root_position_rot6d':
                     motion = np.concatenate((motion[..., :4+(njoints - 1) * 3], motion[..., 4+(njoints - 1) * 3: 4+(njoints - 1) * 9]), axis=-1)
                 elif input_format == 'root_rot6d':
@@ -393,7 +387,6 @@ class UniMocapDataset(data.Dataset):
                     count += 1
                     # print(name)
             except:
-                # import pdb; pdb.set_trace()
                 miss_count += 1
                 pass
 
@@ -418,9 +411,7 @@ class UniMocapDataset(data.Dataset):
         # test 4648
         print('train len', len(data_dict))
         print('test len', len(data_dict))
-        # import pdb; pdb.set_trace()
-
-
+    
 
     def reset_max_len(self, length):
         assert length <= self.max_motion_length
@@ -503,18 +494,6 @@ class UniMocapDataset(data.Dataset):
         "Z Normalization"
         motion = (motion - self.mean) / (self.std + 1e-7)
 
-        # # padding
-        # if m_length < self.max_motion_length:
-        #     motion = np.concatenate(
-        #         [
-        #             motion,
-        #             np.zeros((self.max_motion_length - m_length, motion.shape[1])),
-        #         ],
-        #         axis=0,
-        #     )
-        # print(word_embeddings.shape, motion.shape, m_length)
-        # print(tokens)
-
         # debug check nan
         if np.any(np.isnan(motion)):
             print(retrieval_name, "nan in motion")
@@ -552,7 +531,6 @@ class Text2MotionDatasetBaseline(data.Dataset):
         with cs.open(split_file, "r") as f:
             for line in f.readlines():
                 id_list.append(line.strip())
-        # id_list = id_list[:200]
 
         new_name_list = []
         length_list = []
@@ -672,7 +650,6 @@ class Text2MotionDatasetBaseline(data.Dataset):
         len_gap = (m_length - self.max_length) // self.opt.unit_length
 
         if m_length != self.max_length:
-            # print("Motion original length:%d_%d"%(m_length, len(motion)))
             if self.opt.unit_length < 10:
                 coin2 = np.random.choice(["single", "single", "double"])
             else:
@@ -707,9 +684,7 @@ class Text2MotionDatasetBaseline(data.Dataset):
                 ],
                 axis=0,
             )
-        # print(m_length, src_motion.shape, tgt_motion.shape)
-        # print(word_embeddings.shape, motion.shape)
-        # print(tokens)
+        
         return word_embeddings, caption, sent_len, src_motion, tgt_motion, m_length
 
 
@@ -883,7 +858,6 @@ class TextOnlyDataset(data.Dataset):
         with cs.open(split_file, "r") as f:
             for line in f.readlines():
                 id_list.append(line.strip())
-        # id_list = id_list[:200]
 
         new_name_list = []
         length_list = []
@@ -1082,9 +1056,6 @@ class Text2MotionDatasetMotionX(data.Dataset):
             self.text_enc = text_enc
 
 
-        
-
-
         if dataset_name =='t2m' or dataset_name =='motionx':
             min_motion_len = 40 
         else:
@@ -1097,16 +1068,13 @@ class Text2MotionDatasetMotionX(data.Dataset):
         with cs.open(split_file, 'r') as f:
             for line in f.readlines():
                 id_list.append(line.strip())
-        # id_list = id_list[:200]
-        # if opt.debug:
-        #     id_list = id_list[:100]
 
         if tiny or debug:
             progress_bar = False
             maxdata = 10 if tiny else 100
         else:
             maxdata = 1e10
-        # import pdb; pdb.set_trace()
+        
         if progress_bar:
             enumerator = enumerate(
                 track(
@@ -1241,8 +1209,6 @@ class Text2MotionDatasetMotionX(data.Dataset):
         self.name_list = name_list
         self.reset_max_len(self.max_length)
         self.nfeats = motion.shape[1]
-        # import pdb; pdb.set_trace()
-        
         
 
     def reset_max_len(self, length):
@@ -1258,7 +1224,6 @@ class Text2MotionDatasetMotionX(data.Dataset):
         return len(self.name_list) - self.pointer
 
     def __getitem__(self, item):
-        # import pdb; pdb.set_trace()
         idx = self.pointer + item
         data = self.data_dict[self.name_list[idx]]
         
@@ -1347,12 +1312,6 @@ class Text2MotionDatasetMotionX(data.Dataset):
         "Z Normalization"
         motion = (motion - self.mean) / (self.std + 1e-7)
 
-        # if m_length < self.max_motion_length:
-        #     motion = np.concatenate([motion,
-        #                              np.zeros((self.max_motion_length - m_length, motion.shape[1]))
-        #                              ], axis=0)
-        # print(word_embeddings.shape, motion.shape)
-        # print(tokens)
         return word_embeddings, pos_one_hots, caption, sent_len, motion, m_length, '_'.join(tokens), retrieval_name
 
 
@@ -1414,9 +1373,6 @@ class Text2MotionDatasetMotionX_text_all(data.Dataset):
             self.text_enc = text_enc
 
 
-        
-
-
         if dataset_name =='t2m' or dataset_name =='motionx':
             min_motion_len = 40 
         else:
@@ -1429,16 +1385,13 @@ class Text2MotionDatasetMotionX_text_all(data.Dataset):
         with cs.open(split_file, 'r') as f:
             for line in f.readlines():
                 id_list.append(line.strip())
-        # id_list = id_list[:200]
-        # if opt.debug:
-        #     id_list = id_list[:100]
-
+        
         if tiny or debug:
             progress_bar = False
             maxdata = 10 if tiny else 100
         else:
             maxdata = 1e10
-        # import pdb; pdb.set_trace()
+        
         if progress_bar:
             enumerator = enumerate(
                 track(
@@ -1474,7 +1427,6 @@ class Text2MotionDatasetMotionX_text_all(data.Dataset):
                     except:
                         import pdb; pdb.set_trace()
 
-                    # import pdb; pdb.set_trace()
                     with open(pjoin(face_text_dir.replace('face_texts', 'body_texts'), name + '.json'), 'r') as body_f:
                         body_dict = json.load(body_f)
 
@@ -1601,8 +1553,6 @@ class Text2MotionDatasetMotionX_text_all(data.Dataset):
         self.name_list = name_list
         self.reset_max_len(self.max_length)
         self.nfeats = motion.shape[1]
-        # import pdb; pdb.set_trace()
-        
         
 
     def reset_max_len(self, length):
@@ -1618,10 +1568,10 @@ class Text2MotionDatasetMotionX_text_all(data.Dataset):
         return len(self.name_list) - self.pointer
 
     def __getitem__(self, item):
-        # import pdb; pdb.set_trace()
         idx = self.pointer + item
         data = self.data_dict[self.name_list[idx]]
         motion, m_length, text_list = data['motion'], data['length'], data['text']
+        
         # Randomly select a caption
         text_data = random.choice(text_list)
         caption, tokens = text_data['caption'], text_data['tokens']
@@ -1709,13 +1659,7 @@ class Text2MotionDatasetMotionX_text_all(data.Dataset):
 
         "Z Normalization"
         motion = (motion - self.mean) / (self.std + 1e-7)
-
-        # if m_length < self.max_motion_length:
-        #     motion = np.concatenate([motion,
-        #                              np.zeros((self.max_motion_length - m_length, motion.shape[1]))
-        #                              ], axis=0)
-        # print(word_embeddings.shape, motion.shape)
-        # print(tokens)
+        
         return word_embeddings, pos_one_hots, caption, sent_len, motion, m_length, '_'.join(tokens), body_text, hand_text, face_text
     
     
@@ -1765,7 +1709,6 @@ class Text2MotionDatasetV2(data.Dataset):
             maxdata = 10 if tiny else 100
         else:
             maxdata = 1e10
-        # import pdb; pdb.set_trace()
 
         if progress_bar:
             enumerator = enumerate(
@@ -1780,20 +1723,17 @@ class Text2MotionDatasetV2(data.Dataset):
         miss_count = 0
         new_name_list = []
         length_list = []
-        # import pdb; pdb.set_trace()
+        
         for i, name in enumerator:
             if count > maxdata:
                 break
             try:
-                #     import pdb; pdb.set_trace()
                 motion = np.load(pjoin(motion_dir, name + ".npy"))
 
-                # import pdb; pdb.set_trace()
                 if input_format == 'root_position':
                     motion = motion[..., :4+(njoints-1)*3]
                 elif input_format == 'root_position_vel':
                     motion = np.concatenate((motion[..., :4+(njoints - 1) * 3], motion[..., 4+(njoints - 1) * 9: 4+(njoints - 1) * 9 + njoints*3]), axis=-1)
-                    # import pdb; pdb.set_trace()
                 elif input_format == 'root_position_rot6d':
                     motion = np.concatenate((motion[..., :4+(njoints - 1) * 3], motion[..., 4+(njoints - 1) * 3: 4+(njoints - 1) * 9]), axis=-1)
                 elif input_format == 'root_rot6d':
@@ -1896,7 +1836,6 @@ class Text2MotionDatasetV2(data.Dataset):
         # test 4648
         print('train len', len(data_dict))
         print('test len', len(data_dict))
-        # import pdb; pdb.set_trace()
 
 
 
@@ -1959,18 +1898,6 @@ class Text2MotionDatasetV2(data.Dataset):
         motion = motion[idx:idx + m_length]
         "Z Normalization"
         motion = (motion - self.mean) / self.std
-
-        # # padding
-        # if m_length < self.max_motion_length:
-        #     motion = np.concatenate(
-        #         [
-        #             motion,
-        #             np.zeros((self.max_motion_length - m_length, motion.shape[1])),
-        #         ],
-        #         axis=0,
-        #     )
-        # print(word_embeddings.shape, motion.shape, m_length)
-        # print(tokens)
 
         # debug check nan
         if np.any(np.isnan(motion)):
