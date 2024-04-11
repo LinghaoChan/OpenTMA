@@ -38,13 +38,6 @@ model:
 
   humanact12_rec_path: './deps/actionrecognition'
   uestc_rec_path: './deps/actionrecognition'
-  # Set model path separately for different encoders
-  # TEXT_ENCODER:
-  #   MODELPATH: './deps/distilbert-base-uncased' # bert model path for text encoder
-  # TEXT_STYLE_ENCODER:
-  #   MODELPATH: './deps/distilbert-base-uncased' # bert model path for text style encoder
-  # TEXT_CONTENT_ENCODER:
-  #   MODELPATH: './deps/distilbert-base-uncased' # bert model path for text content encoder
 
 RENDER:
   BLENDER_PATH: '/apdcephfs/share_1227775/mingzhenzhu/jiangbiao/libs/blender-2.93.2-linux-x64/blender'
