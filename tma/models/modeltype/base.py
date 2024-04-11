@@ -286,10 +286,6 @@ class BaseModel(LightningModule):
 
         For each metric in the metrics dictionary, it checks the type of the metric and initializes the corresponding metric object with the appropriate parameters.
 
-        If the metric type is not supported, it raises a NotImplementedError.
-
-        If the metrics dictionary contains "TM2TMetrics" or "UncondMetrics", it also initializes the "MMMetrics" object.
-
         Returns:
             None.
         """
