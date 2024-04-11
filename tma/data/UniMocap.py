@@ -20,7 +20,7 @@ class UniMocapDataModule(BASEDataModule):
         super().__init__(
             batch_size=batch_size, num_workers=num_workers, collate_fn=collate_fn
         )
-        # import pdb; pdb.set_trace()
+        
         self.save_hyperparameters(logger=False)
         self.name = "unimocap"
         self.njoints = 22
@@ -33,17 +33,12 @@ class UniMocapDataModule(BASEDataModule):
         sample_overrides = {"split": "val", "tiny": True, "progress_bar": False}
 
         self._sample_set = self.get_sample_set(overrides=sample_overrides)
+        
         # Get additional info of the dataset
-        # import pdb; pdb.set_trace()
         self.nfeats = self._sample_set.nfeats
         # self.transforms = self._sample_set.transforms
 
     def feats2joints(self, features, skel=None, motion_type="vector_263"):
-        # mean = torch.tensor(self.hparams.mean).to(features)
-        # std = torch.tensor(self.hparams.std).to(features)
-        # features = features * std + mean
-        # return recover_from_ric(features, self.njoints)
-        # import pdb; pdb.set_trace()
         if motion_type in [
             "vector_263",
             "root_position",
@@ -60,7 +55,7 @@ class UniMocapDataModule(BASEDataModule):
             mean = torch.tensor(self.hparams.mean).to(features)
             std = torch.tensor(self.hparams.std).to(features)
             features = features * std + mean
-            # import pdb; pdb.set_trace()
+            
             # skeleton = Skeleton(n_raw_offsets, kinematic_chain, )
             return recover_from_root_rot6d(features, self.njoints, skel)
         elif motion_type == "smplx_212":

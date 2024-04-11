@@ -23,14 +23,6 @@ class UestcDataModule(BASEDataModule):
         self.save_hyperparameters(logger=False)
         self.name = "Uestc"
 
-        # if method_name == "vibe":
-        #     vibe_data_path = os.path.join(self.hparams.datapath,
-        #                                   "vibe_cache_refined.pkl")
-        #     with rich.progress.open(
-        #             vibe_data_path, "rb",
-        #             description="loading uestc vibe data") as f:
-        #         vibe_data = pkl.load(f)
-        #     self.hparams.update({"vibe_data": vibe_data})
         self.Dataset = UESTC
         self.cfg = cfg
 

@@ -214,8 +214,7 @@ mmm2smplh_correspondence = {
     "RF": "right_foot",
 }
 
-smplh2mmm_correspondence = {val: key for key,
-                            val in mmm2smplh_correspondence.items()}
+smplh2mmm_correspondence = {val: key for key, val in mmm2smplh_correspondence.items()}
 smplh2mmm_indexes = [
     smplh_joints.index(mmm2smplh_correspondence[x]) for x in mmm_joints
 ]

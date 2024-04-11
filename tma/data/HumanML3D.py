@@ -20,7 +20,6 @@ class HumanML3DDataModule(BASEDataModule):
         super().__init__(
             batch_size=batch_size, num_workers=num_workers, collate_fn=collate_fn
         )
-        # import pdb; pdb.set_trace()
         self.save_hyperparameters(logger=False)
         self.name = "humanml3d"
         self.njoints = 22
@@ -43,7 +42,6 @@ class HumanML3DDataModule(BASEDataModule):
         # std = torch.tensor(self.hparams.std).to(features)
         # features = features * std + mean
         # return recover_from_ric(features, self.njoints)
-        # import pdb; pdb.set_trace()
         if motion_type in [
             "vector_263",
             "root_position",
@@ -60,7 +58,7 @@ class HumanML3DDataModule(BASEDataModule):
             mean = torch.tensor(self.hparams.mean).to(features)
             std = torch.tensor(self.hparams.std).to(features)
             features = features * std + mean
-            # import pdb; pdb.set_trace()
+            
             # skeleton = Skeleton(n_raw_offsets, kinematic_chain, )
             return recover_from_root_rot6d(features, self.njoints, skel)
         elif motion_type == "smplx_212":

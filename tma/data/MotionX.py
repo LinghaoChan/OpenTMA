@@ -47,7 +47,7 @@ class Motion_XDataModule(BASEDataModule):
         self.cfg = cfg
         sample_overrides = {"split": "val", "tiny": True, "progress_bar": False}
         self._sample_set = self.get_sample_set(overrides=sample_overrides)
-        # import pdb; pdb.set_trace()
+        
         # Get additional info of the dataset
         self.nfeats = self._sample_set.nfeats
         # self.transforms = self._sample_set.transforms
@@ -58,7 +58,7 @@ class Motion_XDataModule(BASEDataModule):
             mean = torch.tensor(self.hparams.mean).to(features)
             std = torch.tensor(self.hparams.std).to(features)
             features = features * std + mean
-            # import pdb; pdb.set_trace()
+            
             return recover_from_ric(
                 features, self.njoints
             )  # torch.Size([32, 92, 22, 3])
@@ -86,7 +86,6 @@ class Motion_XDataModule(BASEDataModule):
         return features
 
     def renorm4t2m(self, features):
-        # import pdb; pdb.set_trace()
         # renorm to t2m norms for using t2m evaluators
         ori_mean = torch.tensor(self.hparams.mean).to(features)
         ori_std = torch.tensor(self.hparams.std).to(features)
