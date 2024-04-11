@@ -24,9 +24,7 @@ import numpy as np
 import torch.nn.functional as f
 from pathlib import Path
 
-from tma.models.architectures.temos.textencoder.distillbert_actor import (
-    DistilbertActorAgnosticEncoder,
-)
+from tma.models.architectures.temos.textencoder.distillbert_actor import DistilbertActorAgnosticEncoder
 from tma.models.architectures.temos.motionencoder.actor import ActorAgnosticEncoder
 from collections import OrderedDict
 from transformers import AutoTokenizer, AutoModel
