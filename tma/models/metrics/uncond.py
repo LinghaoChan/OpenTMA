@@ -71,6 +71,7 @@ class UncondMetrics(Metric):
 
         # Compute fid
         mu, cov = calculate_activation_statistics_np(all_genmotions)
+        
         # gt_mu, gt_cov = calculate_activation_statistics_np(all_gtmotions)
         gt_mu, gt_cov = calculate_activation_statistics_np(all_gtmotions)
         metrics["FID"] = calculate_frechet_distance_np(gt_mu, gt_cov, mu, cov)
@@ -102,6 +103,7 @@ class UncondMetrics(Metric):
             recmotion_embeddings = torch.flatten(
                 recmotion_embeddings, start_dim=1
             ).detach()
+            
             # store all texts and motions
             self.recmotion_embeddings.append(recmotion_embeddings)
         gtmotion_embeddings = torch.flatten(gtmotion_embeddings, start_dim=1).detach()
