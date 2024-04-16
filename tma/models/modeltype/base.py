@@ -5,7 +5,6 @@ import torch
 from pytorch_lightning import LightningModule
 from tma.models.metrics import (
     ComputeMetrics,
-    MRMetrics,
     TM2TMetrics,
     MMMetrics,
     UncondMetrics,
