@@ -301,22 +301,6 @@ class BaseModel(LightningModule):
                     dist_sync_on_step=self.cfg.METRIC.DIST_SYNC_ON_STEP,
                     use_TMR=self.cfg.LOSS.TRAIN_TMR,
                 )
-            elif metric == "MRMetrics":
-                self.MRMetrics = MRMetrics(
-                    njoints=self.njoints,
-                    jointstype=self.cfg.DATASET.JOINT_TYPE,
-                    dist_sync_on_step=self.cfg.METRIC.DIST_SYNC_ON_STEP,
-                )
-            elif metric == "HUMANACTMetrics":
-                self.HUMANACTMetrics = HUMANACTMetrics(
-                    datapath=os.path.join(
-                        self.cfg.model.humanact12_rec_path, "humanact12_gru.tar"
-                    ),
-                    diversity_times=30 if self.debug else self.cfg.TEST.DIVERSITY_TIMES,
-                    multimodality_times=self.cfg.TEST.MM_NUM_TIMES,
-                    dist_sync_on_step=self.cfg.METRIC.DIST_SYNC_ON_STEP,
-                )
-
             elif metric == "UncondMetrics":
                 self.UncondMetrics = UncondMetrics(
                     diversity_times=30 if self.debug else self.cfg.TEST.DIVERSITY_TIMES,
