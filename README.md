@@ -16,7 +16,17 @@ pip install opentma
 
 ```python
 from opentma import *
+
+# Load text and motion data
+
 ```
 
+## Test for Evaluation
 
+Before running the code below, please revise the `retreival.sh` (like `path1` variable) file to set the correct path for the data. 
 
+```bash
+bash retreival.sh
+```
+
+For convenience, the output format is in the form of markdown. 
