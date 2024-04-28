@@ -838,13 +838,29 @@ class TEMOS(BaseModel):
                     ],
                     dim=0,
                 )
+                
+                # convert the string to tensor via ASCII codes
+                # Mainly because the all_gather function does not support string, but it supports tensor
+                namelist = [i for sublist in self.retrieval_corres_name for i in sublist]
+                max_length = 7
+                self.tensor_list = []
+                for string in namelist:
+                    tensor = torch.zeros(max_length, dtype=torch.int)
+                    # print(string)
+                    for i, char in enumerate(string):
+                        tensor[i] = ord(char)
+                    self.tensor_list.append(tensor)
 
-                # Concatenate all the corresponding names across all devices
-                tmp_retrieval_name = []
-                for i in self.all_gather(self.retrieval_corres_name):
-                    tmp_retrieval_name += i
-                self._retrieval_corres_name = tmp_retrieval_name
+                # all_gather the tensor list
+                gathered_data = self.all_gather(self.tensor_list)
 
+                # convert the gathered data to a list of strings
+                self._retrieval_corres_name = []
+                for gathered_batch in gathered_data:
+                    gathered_strings = [''.join([chr(int(char)) for char in tensor if int(char) > 0]) for tensor in gathered_batch]
+                    self._retrieval_corres_name.extend(gathered_strings)
+                
+                
                 # Save the corresponding names to a text file
                 with open(output_dir / "test_name_debug.txt", "w") as test_name_file:
                     for i in self._retrieval_corres_name:
