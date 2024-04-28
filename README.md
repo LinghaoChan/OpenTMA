@@ -15,10 +15,26 @@ pip install opentma
 ### Usage
 
 ```python
-from opentma import *
-
 # Load text and motion data
+import torch
+from transformers import AutoTokenizer, AutoModel
+from tma.models.architectures.temos.textencoder.distillbert_actor import DistilbertActorAgnosticEncoder
+from tma.models.architectures.temos.motionencoder.actor import ActorAgnosticEncoder
+from collections import OrderedDict
 
+modelpath = 'distilbert-base-uncased'
+
+textencoder = DistilbertActorAgnosticEncoder(modelpath, num_layers=4)
+motionencoder = ActorAgnosticEncoder(nfeats=126, vae = True, num_layers=4)
+
+"""
+load model here
+"""
+
+motion = torch.randn(1, 64, 126)    # B = 1, T = , D = , need normalization
+lengths = [64]
+print(textencoder(["a man is running"]).loc)
+print(motionencoder(motion, lengths).loc)
 ```
 
 ## Test for Evaluation
