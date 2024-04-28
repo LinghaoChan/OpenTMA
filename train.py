@@ -123,7 +123,7 @@ def main():
             filename="{epoch}",
             monitor="step",
             mode="max",
-            every_n_epochs=cfg.LOGGER.SACE_CHECKPOINT_EPOCH,
+            every_n_epochs=cfg.LOGGER.SAVE_CHECKPOINT_EPOCH,
             save_top_k=-1,
             save_last=False,
             save_on_train_epoch_end=True,

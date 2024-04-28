@@ -1,8 +1,8 @@
-NAME: H3D-TMR-release # Experiment name
+NAME: H3D-TMR-release-2 # Experiment name
 DEBUG: False # Debug mode
 ACCELERATOR: 'gpu' # Devices optioncal: “cpu”, “gpu”, “tpu”, “ipu”, “hpu”, “mps, “auto”
-# DEVICE: [0,1,2,3] # Index of gpus eg. [0] or [0,1,2,3]
-DEVICE: [0] # Index of gpus eg. [0] or [0,1,2,3]
+DEVICE: [0,1,2,3] # Index of gpus eg. [0] or [0,1,2,3]
+# DEVICE: [0] # Index of gpus eg. [0] or [0,1,2,3]
 
 # Training configuration
 TRAIN:
@@ -44,7 +44,8 @@ DATASET:
   VERSION: ''
   MOTION_TYPE: 'vector_263'
 METRIC:
-  TYPE: ['TemosMetric', 'TM2TMetrics']
+  # TYPE: ['TemosMetric', 'TM2TMetrics']
+  TYPE: []
 # Losses Configuration
 LOSS:
   TYPE: temos # Losses type
@@ -82,7 +83,7 @@ model:
 
 # Logger configuration
 LOGGER:
-  SACE_CHECKPOINT_EPOCH: 100
+  SAVE_CHECKPOINT_EPOCH: 100
   LOG_EVERY_STEPS: 1
   VAL_EVERY_STEPS: 100
   TENSORBOARD: True
