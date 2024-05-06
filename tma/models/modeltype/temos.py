@@ -862,7 +862,7 @@ class TEMOS(BaseModel):
                 
                 
                 # Save the corresponding names to a text file
-                with open(output_dir / "test_name_debug.txt", "w") as test_name_file:
+                with open(output_dir / "test_name_list.txt", "w") as test_name_file:
                     for i in self._retrieval_corres_name:
                         test_name_file.write(i + "\n")
 
