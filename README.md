@@ -45,4 +45,105 @@ Before running the code below, please revise the `retreival.sh` (like `path1` va
 bash retreival.sh
 ```
 
-For convenience, the output format is in the form of markdown. 
+## Model Training
+
+### Data Preparation
+
+Our OpenTMA project supports three datasets: [HumanML3D](https://github.com/EricGuo5513/HumanML3D?tab=readme-ov-file#how-to-obtain-the-data), [Motion-X](https://motionx.deepdataspace.com/), and [UniMoCap](https://github.com/LinghaoChan/UniMoCap). 
+
+<details>
+  <summary><b> HumanML3D Data Preparation </b></summary>
+
+Please following the instructions in the [HumanML3D](https://github.com/EricGuo5513/HumanML3D?tab=readme-ov-file#how-to-obtain-the-data) repository to download and preprocess the data. The data should be stored in the `./datasets/humanml3d` folder. The path tree should look like this:
+
+```
+./OpenTMR/datasets/humanml3d/
+├── all.txt
+├── Mean.npy
+├── new_joints/
+├── new_joint_vecs/
+├── Std.npy
+├── test.txt
+├── texts/
+├── train.txt
+├── train_val.txt
+└── val.txt
+```
+
+</details>
+
+
+<details>
+  <summary><b> Motion-X Data Preparation </b></summary>
+
+Please following the instructions in the [Motion-X](https://github.com/IDEA-Research/Motion-X?tab=readme-ov-file#-dataset-download) project. And then please follow the [HumanTOMATO](https://github.com/IDEA-Research/HumanTOMATO/tree/main/src/tomato_represenation) repository to preprocess the data into `tomatao` format. The data should be stored in the `./datasets/Motion-X` folder. The path tree should look like this:
+
+```
+./OpenTMR/datasets/Motion-X
+├── mean_std
+│   └── vector_623
+│       ├── mean.npy
+│       └── std.npy
+├── motion_data
+│   └── vector_623
+│       ├── aist/       (subset_*/*.npy)
+│       ├── animation/
+│       ├── dance/
+│       ├── EgoBody/
+│       ├── fitness/
+│       ├── game_motion/
+│       ├── GRAB/
+│       ├── HAA500/
+│       ├── humanml/
+│       ├── humman/
+│       ├── idea400/
+│       ├── kungfu/
+│       ├── music/
+│       └── perform/
+├── split
+│   ├── all.txt
+│   ├── test.txt
+│   ├── train.txt
+│   └── val.txt
+└── texts
+    ├── semantic_texts
+    │   ├── aist/       (subset_*/*.txt)
+    │   ├── animation/
+    │   ├── dance/
+    │   ├── EgoBody/
+    │   ├── fitness/
+    │   ├── game_motion/
+    │   ├── GRAB/
+    │   ├── HAA500/
+    │   ├── humanml/
+    │   ├── humman/
+    │   ├── idea400/
+    │   ├── kungfu/
+    │   ├── music/
+    └───└── perform/
+```
+
+</details>
+
+
+<details>
+  <summary><b> UniMoCap Data Preparation </b></summary>
+
+Please following the instructions in the [UniMoCap](https://github.com/LinghaoChan/UniMoCap) repository to download and preprocess the data (HumanML3D, BABEL, and KIT-ML). The data should be stored in the `./datasets/UniMocap` folder. The path tree should look like this:
+
+```
+./OpenTMR/datasets/UniMocap
+├── all.txt
+├── Mean.npy
+├── new_joints/     (*.npy)
+├── new_joint_vecs/ (*.npy)
+├── Std.npy
+├── test.txt
+├── texts/          (*.txt)
+├── train.txt
+├── train_val.txt
+└── val.txt
+```
+
+</details>
+
