@@ -56,6 +56,7 @@ Before running the code below, please revise the `retreival.sh` (like `path1` va
 ```bash
 bash retreival.sh
 ```
+The result will be in a markdown table format.
 
 ## Model Training
 
@@ -283,4 +284,4 @@ If you use the dataset, you need to cite subset KIT-ML and AMASS.
 }
 ```
 
-If you have any question, please contact Ling-Hao CHEN (thu [DOT] lhchen [AT] gmail [DOT] com).
+If you have any question, please contact Ling-Hao CHEN (thu [DOT] lhchen [AT] gmail [DOT] com) and Shunlin Lu (shunilnlu0803 [AT] gmail [DOT] com).
