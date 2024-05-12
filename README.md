@@ -1,9 +1,13 @@
 # OpenTMA: Open Text-Motion Alignment Project
 
+Reproduced by [Ling-Hao Chen](https://lhchen.top/) and [Shunlin Lu](https://shunlinlu.github.io/) (credit also with [TMR](https://mathis.petrovich.fr/tmr/)). 
+
+
 ## ✨ Quick Introduction
 
 OpenTMA is a project that aims to provide a simple and efficient way to align text and motion data. It is designed to be easy to use and flexible, allowing users to align text and motion data in the latent space. 
 
+In the [HumanTOMATO](https://lhchen.top/HumanTOMATO/) (ICML 2024) project, we clarify the importance of how to use the text and motion data to generate motions for the first time. 
 
 ## Todo List
 
@@ -17,7 +21,7 @@ OpenTMA is a project that aims to provide a simple and efficient way to align te
 ### Installation
 
 ```bash
-pip install opentma
+pip install -r requirements.txt
 ```
 
 ### Usage
@@ -206,4 +210,77 @@ Finally, the path tree should look like this:
 
 ### 3. Downloading Pretrained Checkpoints
 
-We provide some pretrained checkpoints of OpenTMA for evaluation.
+We will provide some pretrained checkpoints of OpenTMA for evaluation. (before May 15th, 2024)
+
+
+# 🤝🏼 Citation
+
+If you use this repository for research, you need to cite:
+```bash
+@article{humantomato,
+  title={HumanTOMATO: Text-aligned Whole-body Motion Generation},
+  author={Lu, Shunlin and Chen, Ling-Hao and Zeng, Ailing and Lin, Jing and Zhang, Ruimao and Zhang, Lei and Shum, Heung-Yeung},
+  journal={arxiv:2310.12978},
+  year={2023}
+}
+```
+
+```bash
+@article{chen2023unimocap,
+  title={UniMocap: Unifier for BABEL, HumanML3D, and KIT},
+  author={Chen, Ling-Hao and UniMocap, Contributors},
+  journal={https://github.com/LinghaoChan/UniMoCap},
+  year={2023}
+}
+```
+As some components of UniMoCap are borrowed from [AMASS-Annotation-Unifier](https://github.com/Mathux/AMASS-Annotation-Unifier) and [HumanML3D](https://github.com/EricGuo5513/HumanML3D). You need to cite them accordingly.
+
+```bash
+@inproceedings{petrovich23tmr,
+    title     = {{TMR}: Text-to-Motion Retrieval Using Contrastive {3D} Human Motion Synthesis},
+    author    = {Petrovich, Mathis and Black, Michael J. and Varol, G{\"u}l},
+    booktitle = {International Conference on Computer Vision ({ICCV})},
+    year      = {2023}
+}
+```
+
+```bash
+@InProceedings{Guo_2022_CVPR,
+    author    = {Guo, Chuan and Zou, Shihao and Zuo, Xinxin and Wang, Sen and Ji, Wei and Li, Xingyu and Cheng, Li},
+    title     = {Generating Diverse and Natural 3D Human Motions From Text},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month     = {June},
+    year      = {2022},
+    pages     = {5152-5161}
+}
+```
+
+If you use the dataset, you need to cite subset KIT-ML and AMASS.
+
+```bash
+@article{Plappert2016,
+    author = {Matthias Plappert and Christian Mandery and Tamim Asfour},
+    title = {The {KIT} Motion-Language Dataset},
+    journal = {Big Data}
+    publisher = {Mary Ann Liebert Inc},
+    year = {2016},
+    month = {dec},
+    volume = {4},
+    number = {4},
+    pages = {236--252}
+}
+```
+
+```bash
+@conference{AMASS2019,
+  title = {AMASS: Archive of Motion Capture as Surface Shapes},
+  author = {Mahmood, Naureen and Ghorbani, Nima and Troje, Nikolaus F. and Pons-Moll, Gerard and Black, Michael J.},
+  booktitle = {International Conference on Computer Vision},
+  pages = {5442--5451},
+  month = oct,
+  year = {2019},
+  month_numeric = {10}
+}
+```
+
+If you have any question, please contact Ling-Hao CHEN (thu [DOT] lhchen [AT] gmail [DOT] com).
