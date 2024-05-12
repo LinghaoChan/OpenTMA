@@ -1,4 +1,4 @@
-NAME: MotionX-TMR-evanmotion # Experiment name
+NAME: MotionX-TMR-v1 # Experiment name
 DEBUG: False # Debug mode
 ACCELERATOR: 'gpu' # Devices optioncal: “cpu”, “gpu”, “tpu”, “ipu”, “hpu”, “mps, “auto”
 DEVICE: [0,1,2] # Index of gpus eg. [0] or [0,1,2,3]
@@ -31,7 +31,7 @@ EVAL:
 TEST:
   PRETRAINED_CHECKPOINTS_VAE: ''
   SAVE_PREDICTIONS: False
-  CHECKPOINTS: './experiments/temos/MotionX-TMR/checkpoints/epoch=999.ckpt' # Pretrained model path
+  CHECKPOINTS: './experiments/temos/MotionX-TMR-v1/checkpoints/epoch=299.ckpt' # Pretrained model path
   DATASETS: ['motionx'] # training datasets
   SPLIT: test
   BATCH_SIZE: 32 # training Batch size

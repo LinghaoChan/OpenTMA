@@ -1,4 +1,4 @@
-NAME: H3D-TMR-release-2 # Experiment name
+NAME: H3D-TMR-v1 # Experiment name
 DEBUG: False # Debug mode
 ACCELERATOR: 'gpu' # Devices optioncal: “cpu”, “gpu”, “tpu”, “ipu”, “hpu”, “mps, “auto”
 DEVICE: [0,1,2,3] # Index of gpus eg. [0] or [0,1,2,3]
@@ -29,7 +29,7 @@ EVAL:
 TEST:
   PRETRAINED_CHECKPOINTS_VAE: ''
   SAVE_PREDICTIONS: False
-  CHECKPOINTS: './experiments/temos/H3D-TMR/checkpoints/epoch=999.ckpt' # Pretrained model path
+  CHECKPOINTS: './experiments/temos/H3D-TMR-v1/checkpoints/epoch=299.ckpt' # Pretrained model path
   DATASETS: ['humanml3d'] # training datasets
   SPLIT: test
   BATCH_SIZE: 32 # training Batch size
