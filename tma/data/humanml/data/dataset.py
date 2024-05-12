@@ -1227,7 +1227,7 @@ class Text2MotionDatasetMotionX(data.Dataset):
         idx = self.pointer + item
         data = self.data_dict[self.name_list[idx]]
         
-        retrieval_name = self.name_list[idx].split('_')[-1]
+        retrieval_name = self.name_list[idx]
         
         motion, m_length, text_list = data['motion'], data['length'], data['text']
         # Randomly select a caption
