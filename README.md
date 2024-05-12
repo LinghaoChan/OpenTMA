@@ -4,6 +4,14 @@
 
 OpenTMA is a project that aims to provide a simple and efficient way to align text and motion data. It is designed to be easy to use and flexible, allowing users to align text and motion data in the latent space. 
 
+
+## Todo List
+
+
+- [x] Release the OpenTMA training.
+- [ ] Release the OpenTMA checkpoints.
+- [ ] Support PyPI (`pip install opentma`).
+
 ## 🚀 Quick start
 
 ### Installation
@@ -47,7 +55,7 @@ bash retreival.sh
 
 ## Model Training
 
-### Data Preparation
+### 1. Data Preparation
 
 Our OpenTMA project supports three datasets: [HumanML3D](https://github.com/EricGuo5513/HumanML3D?tab=readme-ov-file#how-to-obtain-the-data), [Motion-X](https://motionx.deepdataspace.com/), and [UniMoCap](https://github.com/LinghaoChan/UniMoCap). 
 
@@ -147,3 +155,55 @@ Please following the instructions in the [UniMoCap](https://github.com/LinghaoCh
 
 </details>
 
+
+
+### 2. Pretrained Checkpoints Used in the Evaluation 
+
+Here, we provide some pre-traind checkpoints for the evaluation. Here are two methods to download the checkpoints:
+
+
+<details>
+<summary><b> Google Drive</b></summary>
+
+
+Download the checkpoints from the [Google Drive](https://drive.google.com/drive/folders/1aWpJH4KTXsWnxG5MciLHXPXGBS7vWXf7?usp=share_link) and put them in the `./deps` folder. Please unzip the checkpoints via the following command:
+```
+unzip *.zip
+```
+Finally, the path tree should look like this:
+
+```
+./deps
+├── distilbert-base-uncased/
+├── glove/
+├── t2m/
+└── transforms/
+```
+
+</details>
+
+
+<details>
+<summary><b> Baidu Drive</b></summary>
+
+
+Download the checkpoints from the [Baidu Drive](https://pan.baidu.com/s/1SIwGDX2aDWTR4hLhUHrPlw?pwd=evan ) (code: `evan`) and put them in the `./deps` folder. Please unzip the checkpoints via the following command:
+```
+tar –xvf deps.tar
+```
+Finally, the path tree should look like this:
+
+```
+./deps
+├── distilbert-base-uncased/
+├── glove/
+├── t2m/
+└── transforms/
+```
+
+</details>
+
+
+### 3. Downloading Pretrained Checkpoints
+
+We provide some pretrained checkpoints of OpenTMA for evaluation.
