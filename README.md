@@ -54,7 +54,7 @@ print(motionencoder(motion, lengths).loc)
 We will provide some pretrained checkpoints of OpenTMA for evaluation. (before May 15th, 2024)
 
 
-## Test for Evaluation
+## 🧪 Test for Evaluation
 
 Before running the code below, please revise the `retreival.sh` (like `path1` variable) file to set the correct path for the data. 
 
@@ -63,7 +63,7 @@ bash retreival.sh
 ```
 The result will be in a markdown table format.
 
-## Model Training
+## ⏩ Model Training
 
 ### 1. Data Preparation
 
