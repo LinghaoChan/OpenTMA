@@ -49,6 +49,11 @@ print(textencoder(["a man is running"]).loc)
 print(motionencoder(motion, lengths).loc)
 ```
 
+## Downloading Pretrained Checkpoints
+
+We will provide some pretrained checkpoints of OpenTMA for evaluation. (before May 15th, 2024)
+
+
 ## Test for Evaluation
 
 Before running the code below, please revise the `retreival.sh` (like `path1` variable) file to set the correct path for the data. 
@@ -209,9 +214,29 @@ Finally, the path tree should look like this:
 </details>
 
 
-### 3. Downloading Pretrained Checkpoints
 
-We will provide some pretrained checkpoints of OpenTMA for evaluation. (before May 15th, 2024)
+### 3. Training
+
++ Training on HumanML3D:
+
+```bash
+python -m train --cfg configs/configs_temos/H3D-TMR.yaml --cfg_assets configs/assets.yaml --nodebug
+```
+
++ Training on Motion-X:
+
+```bash
+python -m train --cfg configs/configs_temos/MotionX-TMR.yaml --cfg_assets configs/assets.yaml --nodebug
+```
+
++ Training on UniMoCap:
+
+```bash
+python -m train --cfg configs/configs_temos/UniMoCap-TMR.yaml --cfg_assets configs/assets.yaml --nodebug
+```
+
+The checkpoints will be saved in the `./experiments/`. If you would like to the debug mode, please remove the `--nodebug` flag. The best checkpoints often appear in the 100-500th epoch.
+
 
 
 # 🤝🏼 Citation
