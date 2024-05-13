@@ -2,15 +2,28 @@
 
 Reproduced by [Ling-Hao Chen](https://lhchen.top/) and [Shunlin Lu](https://shunlinlu.github.io/) (credit also with [TMR](https://mathis.petrovich.fr/tmr/)). 
 
+<iframe
+    src="https://swanhub.co/demo/Evan/OpenTMR"
+    frameborder="0"
+    width="850"
+    height="450"
+></iframe>
 
 ## ✨ Quick Introduction
 
 OpenTMA is a project that aims to provide a simple and efficient way to align text and motion data. It is designed to be easy to use and flexible, allowing users to align text and motion data in the latent space. 
 
-In the [HumanTOMATO](https://lhchen.top/HumanTOMATO/) (ICML 2024) project, we clarify the importance of how to use the text and motion data to generate motions for the first time. 
+In the [HumanTOMATO](https://lhchen.top/HumanTOMATO/) (ICML 2024) project, we clarify the importance of how to use the text and motion data to generate motions for the first time. We highlight the two method.
+
++ Replace your CLIP text encoder with OpenTMA text encoder.
+
++ Introduce the text-motion alignment supervision to your motion generation model during training. 
+
+## 📢 News
+
++ [2024/05/12] We release the OpenTMA training and checkpoints.
 
 ## Todo List
-
 
 - [x] Release the OpenTMA training.
 - [x] Release the OpenTMA checkpoints.
