@@ -1,15 +1,11 @@
 # OpenTMA: Open Text-Motion Alignment Project
 
-Reproduced by [Ling-Hao Chen](https://lhchen.top/) and [Shunlin Lu](https://shunlinlu.github.io/) (credit also with [TMR](https://mathis.petrovich.fr/tmr/)). 
+Reproduced by [Ling-Hao Chen](https://lhchen.top/) and [Shunlin Lu](https://shunlinlu.github.io/) (credit also with [TMR](https://mathis.petrovich.fr/tmr/), [SwanHub](https://swanhub.co)). 
 
-<iframe
-    src="https://swanhub.co/demo/Evan/OpenTMR"
-    frameborder="0"
-    width="850"
-    height="450"
-></iframe>
+**❗️[Highlight]: We provide a [demo](https://swanhub.co/Evan/OpenTMR/demo) for the OpenTMA in [HumanTOMATO](https://github.com/IDEA-Research/HumanTOMATO).** The demo is supported by the [SwanHub](https://swanhub.co) engineering team. Hav a try! 
 
 ## ✨ Quick Introduction
+
 
 OpenTMA is a project that aims to provide a simple and efficient way to align text and motion data. It is designed to be easy to use and flexible, allowing users to align text and motion data in the latent space. 
 
@@ -69,14 +65,6 @@ print(textencoder(["a man is running"]).loc)
 print(motionencoder(motion, lengths).loc)
 ```
 
-## 🧪 Test for Evaluation
-
-Before running the code below, please revise the `retreival.sh` (like `path1` variable) file to set the correct path for the data. 
-
-```bash
-bash retreival.sh
-```
-The result will be in a markdown table format.
 
 ## ⏩ Model Training
 
@@ -253,6 +241,14 @@ python -m train --cfg configs/configs_temos/UniMoCap-TMR.yaml --cfg_assets confi
 The checkpoints will be saved in the `./experiments/`. If you would like to the debug mode, please remove the `--nodebug` flag. The best checkpoints often appear in the 100-500th epoch.
 
 
+## 🧪 Test for Evaluation
+
+Before running the code below, please revise the `retreival.sh` (like `path1` variable) file to set the correct path for the data. 
+
+```bash
+bash retreival.sh
+```
+The result will be in a markdown table format.
 
 # 🤝🏼 Citation
 
