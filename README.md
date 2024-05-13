@@ -51,7 +51,10 @@ print(motionencoder(motion, lengths).loc)
 
 ## Downloading Pretrained Checkpoints
 
-We will provide some pretrained checkpoints of OpenTMA for evaluation. (before May 15th, 2024)
+We provide some pretrained checkpoints of OpenTMA for evaluation. Here are two methods to download the checkpoints. 1) You can download the checkpoints from the [Google Drive](https://drive.google.com/drive/folders/1QpwuabWIFpXRMMO4ioqRez3oyIhmHkQ5?usp=share_link). 2) You can download the checkpoints from the [Baidu Drive]([https://pan.baidu.com/s/1SIwGDX2aDWTR4hLhUHrPlw?pwd=evan](https://pan.baidu.com/s/1duHdATNAyYLdjfQhMPcJCw?pwd=evan)) (code: `evan`).
+```
+
+
 
 
 ## 🧪 Test for Evaluation
