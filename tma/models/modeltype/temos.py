@@ -842,7 +842,7 @@ class TEMOS(BaseModel):
                 # convert the string to tensor via ASCII codes
                 # Mainly because the all_gather function does not support string, but it supports tensor
                 namelist = [i for sublist in self.retrieval_corres_name for i in sublist]
-                max_length = 100
+                max_length = 300
                 self.tensor_list = []
                 for string in namelist:
                     tensor = torch.zeros(max_length, dtype=torch.int)
