@@ -4,6 +4,10 @@ Reproduced by [Ling-Hao Chen](https://lhchen.top/) and [Shunlin Lu](https://shun
 
 **❗️[Highlight]: We provide a [demo](https://swanhub.co/Evan/OpenTMR/demo) for the OpenTMA in [HumanTOMATO](https://github.com/IDEA-Research/HumanTOMATO).** The demo is supported by the [SwanHub](https://swanhub.co) engineering team. Hav a try! 
 
+<p align="center">
+  <img src="assets/logo.png"/>
+</p>
+
 ## ✨ Quick Introduction
 
 
