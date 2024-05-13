@@ -13,7 +13,7 @@ In the [HumanTOMATO](https://lhchen.top/HumanTOMATO/) (ICML 2024) project, we cl
 
 
 - [x] Release the OpenTMA training.
-- [ ] Release the OpenTMA checkpoints.
+- [x] Release the OpenTMA checkpoints.
 - [ ] Support PyPI (`pip install opentma`).
 
 ## 🚀 Quick start
