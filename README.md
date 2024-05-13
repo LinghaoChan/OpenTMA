@@ -24,6 +24,13 @@ In the [HumanTOMATO](https://lhchen.top/HumanTOMATO/) (ICML 2024) project, we cl
 pip install -r requirements.txt
 ```
 
+
+### Downloading Pretrained Checkpoints
+
+We provide some pretrained checkpoints of OpenTMA for evaluation. Here are two methods to download the checkpoints. 1) You can download the checkpoints from the [Google Drive](https://drive.google.com/drive/folders/1QpwuabWIFpXRMMO4ioqRez3oyIhmHkQ5?usp=share_link). 2) You can download the checkpoints from the [Baidu Drive](https://pan.baidu.com/s/1N9P_2q5d2wUEmrVoPOPbZg?pwd=evan) (pwd: `evan`).
+
+
+
 ### Usage
 
 ```python
@@ -48,14 +55,6 @@ lengths = [64]
 print(textencoder(["a man is running"]).loc)
 print(motionencoder(motion, lengths).loc)
 ```
-
-## Downloading Pretrained Checkpoints
-
-We provide some pretrained checkpoints of OpenTMA for evaluation. Here are two methods to download the checkpoints. 1) You can download the checkpoints from the [Google Drive](https://drive.google.com/drive/folders/1QpwuabWIFpXRMMO4ioqRez3oyIhmHkQ5?usp=share_link). 2) You can download the checkpoints from the [Baidu Drive]([https://pan.baidu.com/s/1SIwGDX2aDWTR4hLhUHrPlw?pwd=evan](https://pan.baidu.com/s/1duHdATNAyYLdjfQhMPcJCw?pwd=evan)) (code: `evan`).
-```
-
-
-
 
 ## 🧪 Test for Evaluation
 
@@ -200,7 +199,7 @@ Finally, the path tree should look like this:
 <summary><b> Baidu Drive</b></summary>
 
 
-Download the checkpoints from the [Baidu Drive](https://pan.baidu.com/s/1SIwGDX2aDWTR4hLhUHrPlw?pwd=evan ) (code: `evan`) and put them in the `./deps` folder. Please unzip the checkpoints via the following command:
+Download the checkpoints from the [Baidu Drive](https://pan.baidu.com/s/1SIwGDX2aDWTR4hLhUHrPlw?pwd=evan ) (pwd: `evan`) and put them in the `./deps` folder. Please unzip the checkpoints via the following command:
 ```
 tar –xvf deps.tar
 ```
