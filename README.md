@@ -2,7 +2,7 @@
 
 🕺 Reproduced by [Ling-Hao Chen](https://lhchen.top/) and [Shunlin Lu](https://shunlinlu.github.io/) (credit also with [TMR](https://mathis.petrovich.fr/tmr/), [SwanHub](https://swanhub.co)). 
 
-**❗️[Highlight]: We provide a [demo](https://swanhub.co/Evan/OpenTMR/demo) for the OpenTMA in [HumanTOMATO](https://github.com/IDEA-Research/HumanTOMATO).** The demo is supported by the [SwanHub](https://swanhub.co) engineering team. Hav a try! 
+**❗️[Highlight]: We provide a [demo](https://swanhub.co/demo/Evan/OpenTMR) for the OpenTMA in [HumanTOMATO](https://github.com/IDEA-Research/HumanTOMATO).** The demo is supported by the [SwanHub](https://swanhub.co) engineering team. Hav a try! 
 
 <p align="center">
   <img src="assets/logo.png"/>
