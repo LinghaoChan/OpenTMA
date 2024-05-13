@@ -21,9 +21,9 @@ In the [HumanTOMATO](https://lhchen.top/HumanTOMATO/) (ICML 2024) project, we cl
 
 ## 📢 News
 
-+ [2024/05/12] We release the OpenTMA training and checkpoints.
++ **[2024/05/12] We release the OpenTMA training and checkpoints.**
 
-## Todo List
+## ☑️ Todo List
 
 - [x] Release the OpenTMA training.
 - [x] Release the OpenTMA checkpoints.
@@ -61,6 +61,8 @@ motionencoder = ActorAgnosticEncoder(nfeats=126, vae = True, num_layers=4)
 
 """
 load model here
+You need to normalize the motion data with mean and std.
+For motionx, they are stored in './deps/t2m/motionx/vector_623/Comp_v6_KLD01/meta/*.npy'
 """
 
 motion = torch.randn(1, 64, 126)    # B = 1, T = , D = , need normalization
