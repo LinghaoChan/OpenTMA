@@ -15,9 +15,8 @@ OpenTMA is a project that aims to provide a simple and efficient way to align te
 
 In the [HumanTOMATO](https://lhchen.top/HumanTOMATO/) (ICML 2024) project, we clarify the importance of how to use the text and motion data to generate motions for the first time. We highlight the two method.
 
-+ Replace your CLIP text encoder with OpenTMA text encoder.
-
-+ Introduce the text-motion alignment supervision to your motion generation model during training. 
+> + Replace your CLIP text encoder with OpenTMA text encoder.
+> + Introduce the text-motion alignment supervision to your motion generation model during training. 
 
 ## 📢 News
 
@@ -249,7 +248,7 @@ The checkpoints will be saved in the `./experiments/`. If you would like to the 
 
 ## 🧪 Test for Evaluation
 
-Before running the code below, please revise the `retreival.sh` (like `path1` variable) file to set the correct path for the data. 
+Before running the code below, please revise the `retreival.sh` (like `path1` variable) file to set the correct path for the data. This command should be used after training. It will evaluate the performance of the model on the test set with **text and motion embeddings**.
 
 ```bash
 bash retreival.sh
@@ -276,7 +275,6 @@ If you use this repository for research, you need to cite:
   year={2023}
 }
 ```
-As some components of UniMoCap are borrowed from [AMASS-Annotation-Unifier](https://github.com/Mathux/AMASS-Annotation-Unifier) and [HumanML3D](https://github.com/EricGuo5513/HumanML3D). You need to cite them accordingly.
 
 ```bash
 @inproceedings{petrovich23tmr,
@@ -298,22 +296,6 @@ As some components of UniMoCap are borrowed from [AMASS-Annotation-Unifier](http
 }
 ```
 
-If you use the dataset, you need to cite subset KIT-ML and AMASS.
-
-```bash
-@article{Plappert2016,
-    author = {Matthias Plappert and Christian Mandery and Tamim Asfour},
-    title = {The {KIT} Motion-Language Dataset},
-    journal = {Big Data}
-    publisher = {Mary Ann Liebert Inc},
-    year = {2016},
-    month = {dec},
-    volume = {4},
-    number = {4},
-    pages = {236--252}
-}
-```
-
 ```bash
 @conference{AMASS2019,
   title = {AMASS: Archive of Motion Capture as Surface Shapes},
@@ -326,4 +308,4 @@ If you use the dataset, you need to cite subset KIT-ML and AMASS.
 }
 ```
 
-If you have any question, please contact Ling-Hao CHEN (thu [DOT] lhchen [AT] gmail [DOT] com) and Shunlin Lu (shunilnlu0803 [AT] gmail [DOT] com).
+If you have any question, please contact [Ling-Hao Chen](https://lhchen.top/) (thu [DOT] lhchen [AT] gmail [DOT] com) and [Shunlin Lu](https://shunlinlu.github.io/) (shunilnlu0803 [AT] gmail [DOT] com).
