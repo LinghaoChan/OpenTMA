@@ -91,3 +91,6 @@ LOGGER:
     PROJECT: null
     OFFLINE: False
     RESUME_ID: null
+  SWANLAB:
+    PROJECT: null
+    EXPERIMENT_NAME: null
