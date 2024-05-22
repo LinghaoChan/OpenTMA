@@ -74,6 +74,18 @@ def main():
             log_model=False,
         )
         loggers.append(wandb_logger)
+    if cfg.LOGGER.SWANLAB.PROJECT:
+        from swanlab.integration.pytorch_lightning import SwanLabLogger
+        swanlab_logger = SwanLabLogger(
+            project=cfg.LOGGER.SWANLAB.PROJECT,
+            workspace=cfg.LOGGER.SWANLAB.WORKSPACE,
+            experiment_name=cfg.LOGGER.SWANLAB.EXPERIMENT_NAME,
+            description=cfg.LOGGER.SWANLAB.DESCRIPTION,
+            cloud=cfg.LOGGER.SWANLAB.CLOUD,
+            logdir=cfg.LOGGER.SWANLAB.LOGDIR,
+            save_dir=cfg.FOLDER_EXP,
+        )
+        loggers.append(swanlab_logger)
     if cfg.LOGGER.TENSORBOARD:
         tb_logger = pl_loggers.TensorBoardLogger(
             save_dir=cfg.FOLDER_EXP, sub_dir="tensorboard", version="", name=""

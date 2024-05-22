@@ -112,6 +112,10 @@ LOGGER:
     OFFLINE: false
     PROJECT: null
     RESUME_ID: null
+  SWANLAB:
+    PROJECT: null
+    EXPERIMENT_NAME: null
+    
 RENDER:
   JOINT_TYPE: mmm
   INPUT_MODE: npy
